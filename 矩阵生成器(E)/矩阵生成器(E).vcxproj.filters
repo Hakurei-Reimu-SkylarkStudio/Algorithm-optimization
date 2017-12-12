@@ -21,20 +21,16 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Service.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Algorithm_package.cpp">
+    <ClCompile Include="矩阵生成器(E).cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Algorithm_service.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="文本写入示例.cpp">
+      <Filter>资源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Text.cpp" />
   </ItemGroup>
 </Project>

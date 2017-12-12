@@ -38,27 +38,26 @@ status SP::initialization()
 	return SUCCESS;
 }
 
+status globalLnitialization();
 
 int main()
 {
 	SP sp[300];
-	char temp[100];	//临时储存
-	fstream matIn("MatIn.txt");	//读取节点间关系表E
-	if (!matIn.is_open())
-	{
-		cout << "File open error!" << endl;
-		exit(1);
-	}
-	while (!matIn.eof())
-	{
-		matIn.getline(temp,100);
-		cout << temp;
-	}
-		//system("pause");
+	string strTemp;	//临时储存
+	int intTemp;	//临时储存
+	fstream matIn;
+	matIn.open("MatIn.txt");	//读取节点间关系表E
+	if (!matIn)
+		cout << "MatIn open filed." << endl;
+	matIn >> intTemp;
+	cout << intTemp;
+	matIn.close();
 	return 0;
 }
-
-#include <stdlib.h>  
+status initialization()
+{
+	return SUCCESS;
+}
 //
 //int main() {
 //	string buffer;
