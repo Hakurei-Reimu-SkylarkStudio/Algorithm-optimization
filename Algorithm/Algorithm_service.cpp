@@ -20,6 +20,22 @@ private:
 	int c[MAX_SIZE] = { 0 };	//服务费用
 	int t[MAX_SIZE] = { 0 };	//服务时间
 };
+
+class G //有向无环图
+{
+public:
+	
+private:
+
+};
+
+G //有向无环图::G //有向无环图()
+{
+}
+
+G //有向无环图::~G //有向无环图()
+{
+}
 int main()
 {
 	return 0;
