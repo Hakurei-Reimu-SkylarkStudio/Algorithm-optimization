@@ -148,7 +148,9 @@
     <ClInclude Include="Service.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Algorithm_package.cpp" />
+    <ClCompile Include="Algorithm_package.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Algorithm_service.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
