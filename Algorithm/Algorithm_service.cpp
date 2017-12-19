@@ -1,60 +1,54 @@
 //Algorithm_service.cpp
-
+#include"stdafx.h"
 //文件读写：http://blog.csdn.net/kingstar158/article/details/6859379/
 
-#include<iostream>
-#include<fstream>
-#include <cassert>
-#include <string>
+//#include"Background.h"
+
 #include"stdafx.h"
 
+using namespace std;
+
+//创建错误代码
+
+typedef int status;
 #define SUCCESS 0
 #define ERR_FILEFILED -1
 #define ERR_NOGOODDATA -2
 
-using namespace std;
+//错误代码
 
-const int MAX_SIZE = 100;	//最大长度
+//函数体
+status initialization();	//初始化
+							//函数体
 
-typedef int status;
-
-int E[MAX_SIZE][MAX_SIZE];	//构建边关系（E）
-
-struct SP
+							//创建数据结构
+struct V	//V节点
 {
-	int t[1];
-	int s[1];
-	int c[1];
+	//前后驱
+	V * prior[1];	//前驱结点
+	V * next[1];	//后继节点
+
+					//服务
+	int s[1];	//名称
+	int t[1];	//时间
+	int c[1];	//价值
 };
-struct V
+//数据结构
+struct ss
 {
-	SP sp[1];
-};
-struct G
-{
-	V v[1];
+	int * a[20];
 };
 
-status globalLnitialization();
+V * v;
+
+status initialization()
+{
+	//cout << v[0].s[0];
+	return SUCCESS;
+}
 
 int main()
 {
-	G g;
-	
-
-	SP sp[300];
-	string strTemp;	//临时储存
-	int intTemp;	//临时储存
-	fstream matIn;
-	matIn.open("MatIn.txt");	//读取节点间关系表E
-	if (!matIn)
-		cout << "MatIn open filed." << endl;
-	matIn >> intTemp;
-	cout << intTemp;
-	matIn.close();
+	initialization();
 	return 0;
-}
-status initialization()
-{
-	return SUCCESS;
 }

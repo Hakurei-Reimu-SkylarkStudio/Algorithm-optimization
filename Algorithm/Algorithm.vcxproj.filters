@@ -36,7 +36,10 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp" />
-    <ClCompile Include="G.cpp">
+    <ClCompile Include="Background.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="initialization.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
