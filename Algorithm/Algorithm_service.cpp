@@ -48,10 +48,7 @@ int limit = 0;				//时间限制
 int main()					//主函数
 {
 	initialization();
-	for (int i = 0; i < 50; i++)
-	{
-		firstSolve();
-	}
+	firstSolve();
 	system("pause");
 	return 0;
 }
@@ -208,10 +205,12 @@ status firstSolve()
 //局部优化
 status localOptimization()
 {
+	
 	return SUCCESS;
 }
 //服务选择
 status serviceChoose()
 {
+
 	return SUCCESS;
 }
