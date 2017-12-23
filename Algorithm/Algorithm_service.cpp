@@ -9,15 +9,9 @@ typedef int status;
 #define ERR_BADDATA -2		//错误：坏数据
 
 //参数体
-#define NODE_MAX 512		//设置节点最大数
+#define NODE_MAX 64			//设置节点最大数
 #define CONNECT_MAX 8		//设置前驱/后继最大连接数
 #define SERVICE_MAX 16		//设置服务最大数
-
-//函数体
-status initialization();	//初始化
-status firstSolve();		//寻找初始解
-status localOptimization();	//局部优化
-status serviceChoose();		//服务选择
 
 //数据结构
 struct V					//V节点
@@ -27,8 +21,8 @@ struct V					//V节点
 	int next[CONNECT_MAX];	//后继节点
 	int countNext;			//后继数
 
-	//服务
-	//int s[SERVICE_MAX];	//名称
+							//服务
+							//int s[SERVICE_MAX];	//名称
 	int t[SERVICE_MAX];		//时间
 	int c[SERVICE_MAX];		//价值
 	int serviceCount;		//服务数
@@ -39,9 +33,17 @@ struct SolveQuene			//解存放区
 	int service = -1;		//选中服务
 };
 
+//函数体
+status initialization();	//初始化
+status firstSolve();		//寻找初始解
+status localOptimization();	//局部优化
+status serviceChoose();		//服务选择
+status chose(SolveQuene[], SolveQuene[], int);//服务选择递归体
+int sumUp(SolveQuene []);		//值累加器
+
 //实例化
 V record[NODE_MAX];
-SolveQuene solveQuene[NODE_MAX];
+SolveQuene solveQuene[NODE_MAX];	//[0]为长度
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
 
@@ -173,7 +175,6 @@ status initialization()
 	leadIn.close();
 	return SUCCESS;			//操作成功返回
 }
-
 //寻找初始解
 status firstSolve()
 {
@@ -193,6 +194,7 @@ status firstSolve()
 			i++;
 		}
 	} while (serviceChoose()!=SUCCESS);
+	serviceChoose();
 	{
 		int i = 1;
 		cout << "初始解";
@@ -204,6 +206,7 @@ status firstSolve()
 		cout << endl;
 		cout << "路径长度" << solveQuene[0].quene;
 		cout << endl;
+		cout << "价值" << sumUp(solveQuene) << endl;
 	}
 	return SUCCESS;
 }
@@ -216,6 +219,51 @@ status localOptimization()
 //服务选择
 status serviceChoose()
 {
-
+	SolveQuene tempQuene[NODE_MAX];
+	chose(solveQuene, tempQuene, 1);
 	return SUCCESS;
+}
+//服务选择递归体
+status chose(SolveQuene orig[], SolveQuene temp[],int i)
+{
+	if (i==orig[0].quene+1)
+	{
+		return SUCCESS;
+	}
+	else
+	{
+		for (int i = 0; i < record[solveQuene[i].quene].serviceCount; i++)
+		{
+			solveQuene[i].service = i;
+			chose(orig, temp, i + 1);
+			if (sumUp(temp)!=-1&&sumUp(temp)<sumUp(orig))	//TODO.
+			{
+				for (int i = 1; i <= orig[0].quene; i++)
+				{
+					orig[i].service = temp[i].service;
+				}
+
+			}
+		}
+	}
+
+}
+//值累加器
+int sumUp(SolveQuene input[])
+{
+	int sumc{ 0 };
+	int sumt{ 0 };
+	for (int i = 1; i <= input[0].quene; i++)
+	{
+		sumc += record[input[i].quene].c[input[i].service];
+		sumt += record[input[i].quene].t[input[i].service];
+	}
+	if (sumt>limit)
+	{
+		return -1;
+	}
+	else
+	{
+		return sumc;
+	}
 }
