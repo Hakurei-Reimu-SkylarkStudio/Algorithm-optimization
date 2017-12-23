@@ -259,3 +259,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/Algorithm/data - 副本.txt
+/Algorithm/data.txt
