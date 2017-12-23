@@ -25,11 +25,13 @@ struct V					//V节点
 	//后驱
 	//V* prior[CONNECT_MAX];//前驱结点
 	int next[CONNECT_MAX];	//后继节点
+	int countNext;			//后继数
 
 	//服务
 	//int s[SERVICE_MAX];	//名称
 	int t[SERVICE_MAX];		//时间
 	int c[SERVICE_MAX];		//价值
+	int serviceCount;		//服务数
 };
 struct SolveQuene			//解存放区
 {
@@ -94,6 +96,7 @@ status initialization()
 		int line;
 		//infile.ignore(1);
 		infile >> line;
+		record[i].countNext = line;
 		for (int j = 0; j < line; j++)
 		{
 			int addnext;
@@ -104,17 +107,10 @@ status initialization()
 	infile.close();
 	for (int i = 1; i <= nodeNumber; i++)
 	{
-		cout << "Node " << setw(2) << i << " has following next node(s): " << endl;
-		for (int j = 0; j < CONNECT_MAX; j++)
+		cout << "Node " << setw(2) << i << " has following " << record[i].countNext << " next node(s): " << endl;
+		for (int j = 0; j < record[i].countNext; j++)
 		{
-			if (record[i].next[j] != 0)
-			{
-				cout << j << '\t' << record[i].next[j] << endl;
-			}
-			else
-			{
-				break;
-			}
+			cout << j << '\t' << record[i].next[j] << endl;
 		}
 	}
 	cout << "End." << endl;
@@ -132,6 +128,7 @@ status initialization()
 	{
 		int count;
 		SP >> count;
+		record[i].serviceCount = count;
 		for (int j = 0; j < count; j++)
 		{
 			int data;
@@ -144,22 +141,12 @@ status initialization()
 	SP.close();
 	for (int i = 1; i <= nodeNumber; i++)
 	{
-		cout << "Node " << setw(2) << i << " has following service(s): " << endl;
-		if (record[i].t[0] != 0)
+		cout << "Node " << setw(2) << i << " has " << record[i].serviceCount << " following service(s): " << endl;
+		for (int j = 0; j < record[i].serviceCount; j++)
 		{
-			for (int j = 0; j < CONNECT_MAX; j++)
-			{
-				if (record[i].t[j] != 0)
-				{
-					cout << "SP[" << j << "]" << endl;
-					cout << 't' << '\t' << record[i].t[j] << endl;
-					cout << 'c' << '\t' << record[i].c[j] << endl;
-				}
-				else
-				{
-					break;
-				}
-			}
+			cout << "SP[" << j << "]" << endl;
+			cout << 't' << '\t' << record[i].t[j] << endl;
+			cout << 'c' << '\t' << record[i].c[j] << endl;
 		}
 	}
 	cout << "End." << endl;
@@ -189,9 +176,15 @@ status initialization()
 //寻找初始解
 status firstSolve()
 {
+	solveQuene[0].quene = 1;
+	int quene=0;
+	int locate = 1;
 	do 
 	{
-
+		while (!locate==nodeNumber)
+		{
+			solveQuene[quene+1].quene=(rand()%record[locate].countNext);
+		}
 	} while (!serviceChoose());
 	return SUCCESS;
 }
