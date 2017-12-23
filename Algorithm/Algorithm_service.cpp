@@ -48,6 +48,10 @@ int limit = 0;				//时间限制
 int main()					//主函数
 {
 	initialization();
+	for (int i = 0; i < 50; i++)
+	{
+		firstSolve();
+	}
 	system("pause");
 	return 0;
 }
@@ -55,7 +59,7 @@ int main()					//主函数
 //初始化
 status initialization()
 {
-	srand(time(0));			//初始化随机数
+	srand(static_cast<unsigned>(time(0)));			//初始化随机数
 	ifstream leadIn;		//主配置导入器
 	string chrLeadIn;
 	cout << "指定配置文件:";
@@ -162,7 +166,7 @@ status initialization()
 	cout << "截止期数据打开成功" << endl;
 	timeLimit >> limit;
 	timeLimit.close();
-	if (!limit>0)
+	if (!(limit>0))
 	{
 		cout << "截止期数据有效性验证失败，请检查数据文件再试。" << endl;
 		return ERR_BADDATA;
@@ -177,18 +181,28 @@ status initialization()
 status firstSolve()
 {
 	solveQuene[0].quene = 1;
-	int quene=0;
 	int locate = 1;
 	do 
 	{
-		quene = 0;
-		locate = 1;
-		while (!locate==nodeNumber)
+		int i = 1;
+		for (int x = 0; x < NODE_MAX; x++)
 		{
-			solveQuene[quene+1].quene=(rand()%record[locate].countNext);
-			quene++;
+			solveQuene[i].quene = 0;
 		}
-	} while (!serviceChoose());
+		while (solveQuene[i - 1].quene !=nodeNumber)
+		{
+			solveQuene[i].quene=record[solveQuene[i-1].quene].next[rand()%record[solveQuene[i-1].quene].countNext];
+			i++;
+		}
+	} while (serviceChoose()!=SUCCESS);
+	int i = 0;
+	cout << "初始解";
+	while (solveQuene[i].quene != 0)
+	{
+		cout << "->" << solveQuene[i].quene;
+		i++;
+	}
+	cout << endl;
 	return SUCCESS;
 }
 //局部优化
