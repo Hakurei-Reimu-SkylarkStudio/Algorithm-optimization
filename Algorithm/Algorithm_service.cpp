@@ -31,13 +31,19 @@ struct V					//V节点
 	int t[SERVICE_MAX];		//时间
 	int c[SERVICE_MAX];		//价值
 };
+struct SolveQuene			//解存放区
+{
+	int quene = 0;			//选中序号
+	int service = -1;		//选中服务
+};
 
 //实例化
 V record[NODE_MAX];
+SolveQuene solveQuene[NODE_MAX];
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
 
-int main()
+int main()					//主函数
 {
 	initialization();
 	system("pause");
@@ -47,7 +53,8 @@ int main()
 //初始化
 status initialization()
 {
-	ifstream leadIn;
+	srand(time(0));			//初始化随机数
+	ifstream leadIn;		//主配置导入器
 	string chrLeadIn;
 	cout << "指定配置文件:";
 	do
@@ -65,7 +72,7 @@ status initialization()
 			record[i].next[j] = 0;	//置空
 		}
 	}
-	ifstream infile;
+	ifstream infile;		//节点配置导入器
 	string strInfile;
 	leadIn >> strInfile;
 	infile.open(strInfile);
@@ -111,7 +118,7 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream SP;
+	ifstream SP;				//服务数据导入器
 	string strSP;
 	leadIn >> strSP;
 	SP.open(strSP);
@@ -156,7 +163,7 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream timeLimit;
+	ifstream timeLimit;			//截止期数据导入器
 	string chrTimeLimit{ 0 };
 	leadIn >> chrTimeLimit;
 	timeLimit.open(chrTimeLimit);
@@ -176,8 +183,9 @@ status initialization()
 	cout << "截止期为" << limit << "。" << endl << "End." << endl;
 	cout << "数据导入完成。" << endl;
 	leadIn.close();
-	return SUCCESS;
+	return SUCCESS;			//操作成功返回
 }
+
 //寻找初始解
 status firstSolve()
 {
