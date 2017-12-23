@@ -4,17 +4,20 @@
 using namespace std;
 //创建错误代码
 typedef int status;
-#define SUCCESS 0
-#define ERR_FAILED -1
-#define ERR_NOGOODDATA -2
+#define SUCCESS 0			//操作成功	
+#define ERR_FAILED -1		//错误：操作失败
+#define ERR_BADDATA -2		//错误：坏数据
+
 //参数体
-#define NODE_MAX 512	//设置节点最大数
-#define CONNECT_MAX 8	//设置前驱/后继最大连接数
-#define SERVICE_MAX 16	//设置服务最大数
+#define NODE_MAX 512		//设置节点最大数
+#define CONNECT_MAX 8		//设置前驱/后继最大连接数
+#define SERVICE_MAX 16		//设置服务最大数
+
 //函数体
 status initialization();	//初始化
+
 //数据结构
-struct V	//V节点
+struct V					//V节点
 {
 	//后驱
 	//V * prior[CONNECT_MAX];	//前驱结点
@@ -22,13 +25,21 @@ struct V	//V节点
 
 	//服务
 	//int s[SERVICE_MAX];	//名称
-	int t[SERVICE_MAX];	//时间
-	int c[SERVICE_MAX];	//价值
+	int t[SERVICE_MAX];		//时间
+	int c[SERVICE_MAX];		//价值
 };
 
+//实例化
 V record[NODE_MAX];
-int nodeNumber = 0;	//节点总数
-int timeLimit = 0;
+int nodeNumber = 0;			//节点总数
+int limit = 0;			//时间限制
+
+int main()
+{
+	initialization();
+	system("pause");
+	return 0;
+}
 
 //初始化
 status initialization()	//初始化
@@ -142,14 +153,25 @@ status initialization()	//初始化
 		}
 	}
 	cout << "End." << endl;
+	ifstream timeLimit;
+	string chrTimeLimit{ 0 };
+	leadIn >> chrTimeLimit;
+	timeLimit.open(chrTimeLimit);
+	if (!timeLimit)
+	{
+		cout << "截止期数据无法打开，请检查配置文件再试。" << endl;
+		return ERR_FAILED;
+	}
+	cout << "截止期数据打开成功" << endl;
+	timeLimit >> limit;
+	timeLimit.close();
+	if (!limit>0)
+	{
+		cout << "截止期数据有效性验证失败，请检查数据文件再试。" << endl;
+		return ERR_BADDATA;
+	}
+	cout << "截止期为" << limit << "。" << endl << "End." << endl;
+	cout << "数据导入完成。" << endl;
 	leadIn.close();
 	return SUCCESS;
-}   
-
-
-int main()
-{
-	initialization();
-	system("pause");
-	return 0;
 }

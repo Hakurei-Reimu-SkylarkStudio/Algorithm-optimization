@@ -21,9 +21,6 @@
     <ClInclude Include="targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Service.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -36,11 +33,5 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Text.cpp" />
-    <ClCompile Include="Background.h">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="initialization.h">
-      <Filter>头文件</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
