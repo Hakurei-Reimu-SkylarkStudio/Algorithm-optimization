@@ -39,8 +39,8 @@
     <ClCompile Include="Background.h">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="initialization.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="initialization.h">
+      <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

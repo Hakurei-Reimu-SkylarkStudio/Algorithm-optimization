@@ -1,3 +1,5 @@
+//ÎÄ¼þ¶ÁÐ´£ºhttp://blog.csdn.net/kingstar158/article/details/6859379/
+
 //#include <iostream>
 //#include <fstream>
 //#include <string>

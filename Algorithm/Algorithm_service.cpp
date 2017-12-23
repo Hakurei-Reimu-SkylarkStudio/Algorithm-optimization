@@ -1,10 +1,5 @@
 //Algorithm_service.cpp
 #include"stdafx.h"
-#include<fstream>
-#include<string>
-#include<iomanip>
-//文件读写：http://blog.csdn.net/kingstar158/article/details/6859379/
-#include"stdafx.h"
 
 using namespace std;
 //创建错误代码
@@ -21,7 +16,7 @@ status initialization();	//初始化
 //数据结构
 struct V	//V节点
 {
-	//前后驱
+	//后驱
 	//V * prior[CONNECT_MAX];	//前驱结点
 	int next[CONNECT_MAX];	//后继节点
 
@@ -30,17 +25,17 @@ struct V	//V节点
 	int t[SERVICE_MAX];	//时间
 	int c[SERVICE_MAX];	//价值
 };
-//数据结构
 
 V record[NODE_MAX];
 int nodeNumber = 0;	//节点总数
 int timeLimit = 0;
 
-status initialization()
+//初始化
+status initialization()	//初始化
 {
 	ifstream leadIn;
 	string chrLeadIn;
-	cout << "指定配置文件:" ;
+	cout << "指定配置文件:";
 	do
 	{
 		cin >> chrLeadIn;
@@ -67,7 +62,7 @@ status initialization()
 	}
 	cout << "节点数据文件打开成功" << endl;
 	infile >> nodeNumber;	//第一个数据为节点总数
-	cout << "文件头记载.节点总数 = "<<nodeNumber<<endl;
+	cout << "文件头记载.节点总数 = " << nodeNumber << endl;
 	if (nodeNumber>NODE_MAX)
 	{
 		cout << "节点数过多，请调整设置后重试。" << endl;
@@ -91,7 +86,7 @@ status initialization()
 		cout << "Node " << setw(2) << i << " has following next node(s): " << endl;
 		for (int j = 0; j < CONNECT_MAX; j++)
 		{
-			if (record[i].next[j]!=0)
+			if (record[i].next[j] != 0)
 			{
 				cout << j << '\t' << record[i].next[j] << endl;
 			}
@@ -101,14 +96,14 @@ status initialization()
 			}
 		}
 	}
-	cout << "End."<<endl;
+	cout << "End." << endl;
 	ifstream SP;
 	string strSP;
 	leadIn >> strSP;
 	SP.open(strSP);
 	if (!SP)
 	{
-		cout << "服务数据无法打开，请检查配置文件再试。"<<endl;
+		cout << "服务数据无法打开，请检查配置文件再试。" << endl;
 		return ERR_FAILED;
 	}
 	cout << "服务数据打开成功" << endl;
@@ -135,7 +130,7 @@ status initialization()
 			{
 				if (record[i].t[j] != 0)
 				{
-					cout << "SP["<<j<<"]" << endl;
+					cout << "SP[" << j << "]" << endl;
 					cout << 't' << '\t' << record[i].t[j] << endl;
 					cout << 'c' << '\t' << record[i].c[j] << endl;
 				}
@@ -149,7 +144,8 @@ status initialization()
 	cout << "End." << endl;
 	leadIn.close();
 	return SUCCESS;
-}
+}   
+
 
 int main()
 {
