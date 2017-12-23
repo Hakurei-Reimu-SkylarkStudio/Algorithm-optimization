@@ -177,11 +177,11 @@ status initialization()
 //寻找初始解
 status firstSolve()
 {
-	solveQuene[0].quene = 1;
+	solveQuene[1].quene = 1;
 	int locate = 1;
 	do 
 	{
-		int i = 1;
+		int i = 2;
 		for (int x = 0; x < NODE_MAX; x++)
 		{
 			solveQuene[i].quene = 0;
@@ -189,17 +189,22 @@ status firstSolve()
 		while (solveQuene[i - 1].quene !=nodeNumber)
 		{
 			solveQuene[i].quene=record[solveQuene[i-1].quene].next[rand()%record[solveQuene[i-1].quene].countNext];
+			solveQuene[0].quene = i;
 			i++;
 		}
 	} while (serviceChoose()!=SUCCESS);
-	int i = 0;
-	cout << "初始解";
-	while (solveQuene[i].quene != 0)
 	{
-		cout << "->" << solveQuene[i].quene;
-		i++;
+		int i = 1;
+		cout << "初始解";
+		while (solveQuene[i].quene != 0)
+		{
+			cout << "->" << solveQuene[i].quene;
+			i++;
+		}
+		cout << endl;
+		cout << "路径长度" << solveQuene[0].quene;
+		cout << endl;
 	}
-	cout << endl;
 	return SUCCESS;
 }
 //局部优化
