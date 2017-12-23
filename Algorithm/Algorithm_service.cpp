@@ -181,6 +181,8 @@ status firstSolve()
 	int locate = 1;
 	do 
 	{
+		quene = 0;
+		locate = 1;
 		while (!locate==nodeNumber)
 		{
 			solveQuene[quene+1].quene=(rand()%record[locate].countNext);
