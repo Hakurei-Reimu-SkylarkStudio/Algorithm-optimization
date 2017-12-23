@@ -15,12 +15,15 @@ typedef int status;
 
 //函数体
 status initialization();	//初始化
+status firstSolve();		//寻找初始解
+status localOptimization();	//局部优化
+status serviceChoose();		//服务选择
 
 //数据结构
 struct V					//V节点
 {
 	//后驱
-	//V * prior[CONNECT_MAX];	//前驱结点
+	//V* prior[CONNECT_MAX];//前驱结点
 	int next[CONNECT_MAX];	//后继节点
 
 	//服务
@@ -32,7 +35,7 @@ struct V					//V节点
 //实例化
 V record[NODE_MAX];
 int nodeNumber = 0;			//节点总数
-int limit = 0;			//时间限制
+int limit = 0;				//时间限制
 
 int main()
 {
@@ -42,7 +45,7 @@ int main()
 }
 
 //初始化
-status initialization()	//初始化
+status initialization()
 {
 	ifstream leadIn;
 	string chrLeadIn;
@@ -72,7 +75,7 @@ status initialization()	//初始化
 		return ERR_FAILED;
 	}
 	cout << "节点数据文件打开成功" << endl;
-	infile >> nodeNumber;	//第一个数据为节点总数
+	infile >> nodeNumber;		//第一个数据为节点总数
 	cout << "文件头记载.节点总数 = " << nodeNumber << endl;
 	if (nodeNumber>NODE_MAX)
 	{
@@ -173,5 +176,24 @@ status initialization()	//初始化
 	cout << "截止期为" << limit << "。" << endl << "End." << endl;
 	cout << "数据导入完成。" << endl;
 	leadIn.close();
+	return SUCCESS;
+}
+//寻找初始解
+status firstSolve()
+{
+	do 
+	{
+
+	} while (!serviceChoose());
+	return SUCCESS;
+}
+//局部优化
+status localOptimization()
+{
+	return SUCCESS;
+}
+//服务选择
+status serviceChoose()
+{
 	return SUCCESS;
 }
