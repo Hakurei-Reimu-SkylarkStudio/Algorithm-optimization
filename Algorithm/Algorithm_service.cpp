@@ -184,6 +184,7 @@ status firstSolve()
 		while (!locate==nodeNumber)
 		{
 			solveQuene[quene+1].quene=(rand()%record[locate].countNext);
+			quene++;
 		}
 	} while (!serviceChoose());
 	return SUCCESS;
