@@ -2,52 +2,52 @@
 #include"stdafx.h"
 
 using namespace std;
-//´´½¨´íÎó´úÂë
+//åˆ›å»ºé”™è¯¯ä»£ç 
 typedef int status;
-#define SUCCESS 0			//²Ù×÷³É¹¦	
-#define ERR_FAILED -1		//´íÎó£º²Ù×÷Ê§°Ü
-#define ERR_BADDATA -2		//´íÎó£º»µÊı¾İ
+#define SUCCESS 0			//æ“ä½œæˆåŠŸ	
+#define ERR_FAILED -1		//é”™è¯¯ï¼šæ“ä½œå¤±è´¥
+#define ERR_BADDATA -2		//é”™è¯¯ï¼šåæ•°æ®
 
-//²ÎÊıÌå
-#define NODE_MAX 64			//ÉèÖÃ½Úµã×î´óÊı
-#define CONNECT_MAX 8		//ÉèÖÃÇ°Çı/ºó¼Ì×î´óÁ¬½ÓÊı
-#define SERVICE_MAX 16		//ÉèÖÃ·şÎñ×î´óÊı
+//å‚æ•°ä½“
+#define NODE_MAX 64			//è®¾ç½®èŠ‚ç‚¹æœ€å¤§æ•°
+#define CONNECT_MAX 8		//è®¾ç½®å‰é©±/åç»§æœ€å¤§è¿æ¥æ•°
+#define SERVICE_MAX 16		//è®¾ç½®æœåŠ¡æœ€å¤§æ•°
 
-//Êı¾İ½á¹¹
-struct V					//V½Úµã
+//æ•°æ®ç»“æ„
+struct V					//VèŠ‚ç‚¹
 {
-	//ºóÇı
-	//V* prior[CONNECT_MAX];//Ç°Çı½áµã
-	int next[CONNECT_MAX];	//ºó¼Ì½Úµã
-	int countNext;			//ºó¼ÌÊı
+	//åé©±
+	//V* prior[CONNECT_MAX];//å‰é©±ç»“ç‚¹
+	int next[CONNECT_MAX];	//åç»§èŠ‚ç‚¹
+	int countNext;			//åç»§æ•°
 
-							//·şÎñ
-							//int s[SERVICE_MAX];	//Ãû³Æ
-	int t[SERVICE_MAX];		//Ê±¼ä
-	int c[SERVICE_MAX];		//¼ÛÖµ
-	int serviceCount;		//·şÎñÊı
+							//æœåŠ¡
+							//int s[SERVICE_MAX];	//åç§°
+	int t[SERVICE_MAX];		//æ—¶é—´
+	int c[SERVICE_MAX];		//ä»·å€¼
+	int serviceCount;		//æœåŠ¡æ•°
 };
-struct SolveQuene			//½â´æ·ÅÇø
+struct SolveQuene			//è§£å­˜æ”¾åŒº
 {
-	int quene = 0;			//Ñ¡ÖĞĞòºÅ
-	int service = -1;		//Ñ¡ÖĞ·şÎñ
+	int quene = 0;			//é€‰ä¸­åºå·
+	int service = -1;		//é€‰ä¸­æœåŠ¡
 };
 
-//º¯ÊıÌå
-status initialization();	//³õÊ¼»¯
-status firstSolve();		//Ñ°ÕÒ³õÊ¼½â
-status localOptimization();	//¾Ö²¿ÓÅ»¯
-status serviceChoose();		//·şÎñÑ¡Ôñ
-status chose(SolveQuene[], SolveQuene[], int);//·şÎñÑ¡Ôñµİ¹éÌå
-int sumUp(SolveQuene []);		//ÖµÀÛ¼ÓÆ÷
+//å‡½æ•°ä½“
+status initialization();	//åˆå§‹åŒ–
+status firstSolve();		//å¯»æ‰¾åˆå§‹è§£
+status localOptimization();	//å±€éƒ¨ä¼˜åŒ–
+status serviceChoose();		//æœåŠ¡é€‰æ‹©
+status chose(SolveQuene[], SolveQuene[], int);//æœåŠ¡é€‰æ‹©é€’å½’ä½“
+int sumUp(SolveQuene []);		//å€¼ç´¯åŠ å™¨
 
-//ÊµÀı»¯
+//å®ä¾‹åŒ–
 V record[NODE_MAX];
-SolveQuene solveQuene[NODE_MAX];	//[0]Îª³¤¶È
-int nodeNumber = 0;			//½Úµã×ÜÊı
-int limit = 0;				//Ê±¼äÏŞÖÆ
+SolveQuene solveQuene[NODE_MAX];	//[0]ä¸ºé•¿åº¦
+int nodeNumber = 0;			//èŠ‚ç‚¹æ€»æ•°
+int limit = 0;				//æ—¶é—´é™åˆ¶
 
-int main()					//Ö÷º¯Êı
+int main()					//ä¸»å‡½æ•°
 {
 	initialization();
 	firstSolve();
@@ -55,43 +55,43 @@ int main()					//Ö÷º¯Êı
 	return 0;
 }
 
-//³õÊ¼»¯
+//åˆå§‹åŒ–
 status initialization()
 {
-	srand(static_cast<unsigned>(time(0)));			//³õÊ¼»¯Ëæ»úÊı
-	ifstream leadIn;		//Ö÷ÅäÖÃµ¼ÈëÆ÷
+	srand(static_cast<unsigned>(time(0)));			//åˆå§‹åŒ–éšæœºæ•°
+	ifstream leadIn;		//ä¸»é…ç½®å¯¼å…¥å™¨
 	string chrLeadIn;
-	cout << "Ö¸¶¨ÅäÖÃÎÄ¼ş:";
+	cout << "æŒ‡å®šé…ç½®æ–‡ä»¶:";
 	do
 	{
 		cin >> chrLeadIn;
 		leadIn.open(chrLeadIn);
 		if (leadIn)
 			break;
-		cout << "ÎÄ¼şÎŞ·¨´ò¿ª,Çë¼ì²éÊäÈëÔÙÊÔ¡£";
+		cout << "æ–‡ä»¶æ— æ³•æ‰“å¼€,è¯·æ£€æŸ¥è¾“å…¥å†è¯•ã€‚";
 	} while (!leadIn);
 	for (int i = 0; i < NODE_MAX; i++)
 	{
 		for (int j = 0; j < CONNECT_MAX; j++)
 		{
-			record[i].next[j] = 0;	//ÖÃ¿Õ
+			record[i].next[j] = 0;	//ç½®ç©º
 		}
 	}
-	ifstream infile;		//½ÚµãÅäÖÃµ¼ÈëÆ÷
+	ifstream infile;		//èŠ‚ç‚¹é…ç½®å¯¼å…¥å™¨
 	string strInfile;
 	leadIn >> strInfile;
 	infile.open(strInfile);
 	if (!infile)
 	{
-		cout << "½ÚµãÊı¾İÎÄ¼şÎŞ·¨´ò¿ª,Çë¼ì²éÅäÖÃÎÄ¼şÔÙÊÔ¡£";
+		cout << "èŠ‚ç‚¹æ•°æ®æ–‡ä»¶æ— æ³•æ‰“å¼€,è¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€‚";
 		return ERR_FAILED;
 	}
-	cout << "½ÚµãÊı¾İÎÄ¼ş´ò¿ª³É¹¦" << endl;
-	infile >> nodeNumber;		//µÚÒ»¸öÊı¾İÎª½Úµã×ÜÊı
-	cout << "ÎÄ¼şÍ·¼ÇÔØ.½Úµã×ÜÊı = " << nodeNumber << endl;
+	cout << "èŠ‚ç‚¹æ•°æ®æ–‡ä»¶æ‰“å¼€æˆåŠŸ" << endl;
+	infile >> nodeNumber;		//ç¬¬ä¸€ä¸ªæ•°æ®ä¸ºèŠ‚ç‚¹æ€»æ•°
+	cout << "æ–‡ä»¶å¤´è®°è½½.èŠ‚ç‚¹æ€»æ•° = " << nodeNumber << endl;
 	if (nodeNumber>NODE_MAX)
 	{
-		cout << "½ÚµãÊı¹ı¶à£¬Çëµ÷ÕûÉèÖÃºóÖØÊÔ¡£" << endl;
+		cout << "èŠ‚ç‚¹æ•°è¿‡å¤šï¼Œè¯·è°ƒæ•´è®¾ç½®åé‡è¯•ã€‚" << endl;
 		return ERR_FAILED;
 	}
 	for (int i = 1; i <= nodeNumber; i++)
@@ -117,16 +117,16 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream SP;				//·şÎñÊı¾İµ¼ÈëÆ÷
+	ifstream SP;				//æœåŠ¡æ•°æ®å¯¼å…¥å™¨
 	string strSP;
 	leadIn >> strSP;
 	SP.open(strSP);
 	if (!SP)
 	{
-		cout << "·şÎñÊı¾İÎŞ·¨´ò¿ª£¬Çë¼ì²éÅäÖÃÎÄ¼şÔÙÊÔ¡£" << endl;
+		cout << "æœåŠ¡æ•°æ®æ— æ³•æ‰“å¼€ï¼Œè¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€‚" << endl;
 		return ERR_FAILED;
 	}
-	cout << "·şÎñÊı¾İ´ò¿ª³É¹¦" << endl;
+	cout << "æœåŠ¡æ•°æ®æ‰“å¼€æˆåŠŸ" << endl;
 	for (int i = 1; i <= nodeNumber; i++)
 	{
 		int count;
@@ -153,29 +153,29 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream timeLimit;			//½ØÖ¹ÆÚÊı¾İµ¼ÈëÆ÷
+	ifstream timeLimit;			//æˆªæ­¢æœŸæ•°æ®å¯¼å…¥å™¨
 	string chrTimeLimit{ 0 };
 	leadIn >> chrTimeLimit;
 	timeLimit.open(chrTimeLimit);
 	if (!timeLimit)
 	{
-		cout << "½ØÖ¹ÆÚÊı¾İÎŞ·¨´ò¿ª£¬Çë¼ì²éÅäÖÃÎÄ¼şÔÙÊÔ¡£" << endl;
+		cout << "æˆªæ­¢æœŸæ•°æ®æ— æ³•æ‰“å¼€ï¼Œè¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€‚" << endl;
 		return ERR_FAILED;
 	}
-	cout << "½ØÖ¹ÆÚÊı¾İ´ò¿ª³É¹¦" << endl;
+	cout << "æˆªæ­¢æœŸæ•°æ®æ‰“å¼€æˆåŠŸ" << endl;
 	timeLimit >> limit;
 	timeLimit.close();
 	if (!(limit>0))
 	{
-		cout << "½ØÖ¹ÆÚÊı¾İÓĞĞ§ĞÔÑéÖ¤Ê§°Ü£¬Çë¼ì²éÊı¾İÎÄ¼şÔÙÊÔ¡£" << endl;
+		cout << "æˆªæ­¢æœŸæ•°æ®æœ‰æ•ˆæ€§éªŒè¯å¤±è´¥ï¼Œè¯·æ£€æŸ¥æ•°æ®æ–‡ä»¶å†è¯•ã€‚" << endl;
 		return ERR_BADDATA;
 	}
-	cout << "½ØÖ¹ÆÚÎª" << limit << "¡£" << endl << "End." << endl;
-	cout << "Êı¾İµ¼ÈëÍê³É¡£" << endl;
+	cout << "æˆªæ­¢æœŸä¸º" << limit << "ã€‚" << endl << "End." << endl;
+	cout << "æ•°æ®å¯¼å…¥å®Œæˆã€‚" << endl;
 	leadIn.close();
-	return SUCCESS;			//²Ù×÷³É¹¦·µ»Ø
+	return SUCCESS;			//æ“ä½œæˆåŠŸè¿”å›
 }
-//Ñ°ÕÒ³õÊ¼½â
+//å¯»æ‰¾åˆå§‹è§£
 status firstSolve()
 {
 	solveQuene[1].quene = 1;
@@ -197,33 +197,33 @@ status firstSolve()
 	serviceChoose();
 	{
 		int i = 1;
-		cout << "³õÊ¼½â";
+		cout << "åˆå§‹è§£";
 		while (solveQuene[i].quene != 0)
 		{
 			cout << "->" << solveQuene[i].quene;
 			i++;
 		}
 		cout << endl;
-		cout << "Â·¾¶³¤¶È" << solveQuene[0].quene;
+		cout << "è·¯å¾„é•¿åº¦" << solveQuene[0].quene;
 		cout << endl;
-		cout << "¼ÛÖµ" << sumUp(solveQuene) << endl;
+		cout << "ä»·å€¼" << sumUp(solveQuene) << endl;
 	}
 	return SUCCESS;
 }
-//¾Ö²¿ÓÅ»¯
+//å±€éƒ¨ä¼˜åŒ–
 status localOptimization()
 {
 	
 	return SUCCESS;
 }
-//·şÎñÑ¡Ôñ
+//æœåŠ¡é€‰æ‹©
 status serviceChoose()
 {
 	SolveQuene tempQuene[NODE_MAX];
 	chose(solveQuene, tempQuene, 1);
 	return SUCCESS;
 }
-//·şÎñÑ¡Ôñµİ¹éÌå
+//æœåŠ¡é€‰æ‹©é€’å½’ä½“
 status chose(SolveQuene orig[], SolveQuene temp[],int i)
 {
 	if (i==orig[0].quene+1)
@@ -242,13 +242,12 @@ status chose(SolveQuene orig[], SolveQuene temp[],int i)
 				{
 					orig[i].service = temp[i].service;
 				}
-
 			}
 		}
 	}
 
 }
-//ÖµÀÛ¼ÓÆ÷
+//å€¼ç´¯åŠ å™¨
 int sumUp(SolveQuene input[])
 {
 	int sumc{ 0 };
