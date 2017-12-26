@@ -30,7 +30,7 @@ struct V					//V节点
 struct SolveQuene			//解存放区
 {
 	int quene = 0;			//选中序号
-	int service = -1;		//选中服务
+	int service = 0;		//选中服务
 };
 
 //函数体
@@ -38,18 +38,25 @@ status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
 status serviceChoose();		//服务选择
-status chose(SolveQuene orig[], SolveQuene temp[], int i);	//服务选择
+status chose(const int i);		//单步服务选择
 int sumUp(SolveQuene[]);	//值累加器
 
 //实例化
 V record[NODE_MAX];
-SolveQuene solveQuene[NODE_MAX];
+SolveQuene solveQuene[NODE_MAX];	//解数列
+SolveQuene tempQuene[NODE_MAX];		//解数列交换储存
+
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
+
 
 int main()					//主函数
 {
 	initialization();
+	for (int i = 0; i < 1000; i++)
+	{
+		firstSolve();
+	}
 	firstSolve();
 	system("pause");
 	return 0;
@@ -215,34 +222,32 @@ status firstSolve()
 status localOptimization()
 {
 
-	SolveQuene tempQuene[NODE_MAX];
-	chose(solveQuene, tempQuene, 1);
 	return SUCCESS;
 }
 //服务选择
 status serviceChoose()
 {
-
+	chose(1);
 	return SUCCESS;
 }
 //服务选择递归体
-status chose(SolveQuene orig[], SolveQuene temp[], int i)
+status chose(const int i)
 {
-	if (i == orig[0].quene + 1)
+	if (i == solveQuene[0].quene + 1)
 	{
 		return SUCCESS;
 	}
 	else
 	{
-		for (int i = 0; i < record[solveQuene[i].quene].serviceCount; i++)
+		for (int j = 0; j < record[solveQuene[i].quene].serviceCount; j++)
 		{
-			solveQuene[i].service = i;
-			chose(orig, temp, i + 1);
-			if (sumUp(temp) != -1 && sumUp(temp)<sumUp(orig))	//TODO.
+			tempQuene[i].service = j;
+			chose(i + 1);
+			if (sumUp(tempQuene) != -1 && sumUp(tempQuene)<sumUp(solveQuene))	//TODO.
 			{
-				for (int i = 1; i <= orig[0].quene; i++)
+				for (int k = 1; k <= solveQuene[0].quene; k++)
 				{
-					orig[i].service = temp[i].service;
+					solveQuene[k].service = tempQuene[k].service;
 				}
 			}
 		}
