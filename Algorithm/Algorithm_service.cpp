@@ -184,7 +184,7 @@ status firstSolve()
 		int i = 2;
 		for (int x = 0; x < NODE_MAX; x++)
 		{
-			solveQuene[i].quene = 0;
+			solveQuene[i].quene = 0;		//ÖØÖÃ
 		}
 		while (solveQuene[i - 1].quene !=nodeNumber)
 		{
