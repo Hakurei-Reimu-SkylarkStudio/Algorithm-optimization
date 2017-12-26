@@ -2,21 +2,12 @@
 #include"stdafx.h"
 
 using namespace std;
-//åˆ›å»ºé”™è¯¯ä»£ç 
+//´´½¨´íÎó´úÂë
 typedef int status;
-#define SUCCESS 0			//æ“ä½œæˆåŠŸ	
-#define ERR_FAILED -1		//é”™è¯¯ï¼šæ“ä½œå¤±è´?
-#define ERR_BADDATA -2		//é”™è¯¯ï¼šåæ•°æ®
+#define SUCCESS 0			//²Ù×÷³É¹¦	
+#define ERR_FAILED -1		//´íÎó£º²Ù×÷Ê§°Ü
+#define ERR_BADDATA -2		//´íÎó£º»µÊý¾Ý
 
-<<<<<<< HEAD
-//å‚æ•°ä½?
-#define NODE_MAX 64			//è®¾ç½®èŠ‚ç‚¹æœ€å¤§æ•°
-#define CONNECT_MAX 8		//è®¾ç½®å‰é©±/åŽç»§æœ€å¤§è¿žæŽ¥æ•°
-#define SERVICE_MAX 16		//è®¾ç½®æœåŠ¡æœ€å¤§æ•°
-
-//æ•°æ®ç»“æž„
-struct V					//VèŠ‚ç‚¹
-=======
 //²ÎÊýÌå
 #define NODE_MAX 512		//ÉèÖÃ½Úµã×î´óÊý
 #define CONNECT_MAX 8		//ÉèÖÃÇ°Çý/ºó¼Ì×î´óÁ¬½ÓÊý
@@ -30,56 +21,31 @@ status serviceChoose();		//·þÎñÑ¡Ôñ
 
 //Êý¾Ý½á¹¹
 struct V					//V½Úµã
->>>>>>> parent of fd6eaec... 201712230011 with bug.
 {
-	//åŽé©±
-	//V* prior[CONNECT_MAX];//å‰é©±ç»“ç‚¹
-	int next[CONNECT_MAX];	//åŽç»§èŠ‚ç‚¹
-	int countNext;			//åŽç»§æ•?
+	//ºóÇý
+	//V* prior[CONNECT_MAX];//Ç°Çý½áµã
+	int next[CONNECT_MAX];	//ºó¼Ì½Úµã
+	int countNext;			//ºó¼ÌÊý
 
-<<<<<<< HEAD
-							//æœåŠ¡
-							//int s[SERVICE_MAX];	//åç§°
-	int t[SERVICE_MAX];		//æ—¶é—´
-	int c[SERVICE_MAX];		//ä»·å€?
-	int serviceCount;		//æœåŠ¡æ•?
-=======
 	//·þÎñ
 	//int s[SERVICE_MAX];	//Ãû³Æ
 	int t[SERVICE_MAX];		//Ê±¼ä
 	int c[SERVICE_MAX];		//¼ÛÖµ
 	int serviceCount;		//·þÎñÊý
->>>>>>> parent of fd6eaec... 201712230011 with bug.
 };
-struct SolveQuene			//è§£å­˜æ”¾åŒº
+struct SolveQuene			//½â´æ·ÅÇø
 {
-	int quene = 0;			//é€‰ä¸­åºå·
-	int service = -1;		//é€‰ä¸­æœåŠ¡
+	int quene = 0;			//Ñ¡ÖÐÐòºÅ
+	int service = -1;		//Ñ¡ÖÐ·þÎñ
 };
 
-<<<<<<< HEAD
-//å‡½æ•°ä½?
-status initialization();	//åˆå§‹åŒ?
-status firstSolve();		//å¯»æ‰¾åˆå§‹è§?
-status localOptimization();	//å±€éƒ¨ä¼˜åŒ?
-status serviceChoose();		//æœåŠ¡é€‰æ‹©
-status chose(SolveQuene[], SolveQuene[], int);//æœåŠ¡é€‰æ‹©é€’å½’ä½?
-int sumUp(SolveQuene []);		//å€¼ç´¯åŠ å™¨
-
-//å®žä¾‹åŒ?
-V record[NODE_MAX];
-SolveQuene solveQuene[NODE_MAX];	//[0]ä¸ºé•¿åº?
-int nodeNumber = 0;			//èŠ‚ç‚¹æ€»æ•°
-int limit = 0;				//æ—¶é—´é™åˆ¶
-=======
 //ÊµÀý»¯
 V record[NODE_MAX];
 SolveQuene solveQuene[NODE_MAX];
 int nodeNumber = 0;			//½Úµã×ÜÊý
 int limit = 0;				//Ê±¼äÏÞÖÆ
->>>>>>> parent of fd6eaec... 201712230011 with bug.
 
-int main()					//ä¸»å‡½æ•?
+int main()					//Ö÷º¯Êý
 {
 	initialization();
 	firstSolve();
@@ -87,43 +53,43 @@ int main()					//ä¸»å‡½æ•?
 	return 0;
 }
 
-//åˆå§‹åŒ?
+//³õÊ¼»¯
 status initialization()
 {
-	srand(static_cast<unsigned>(time(0)));			//åˆå§‹åŒ–éšæœºæ•°
-	ifstream leadIn;		//ä¸»é…ç½®å¯¼å…¥å™¨
+	srand(static_cast<unsigned>(time(0)));			//³õÊ¼»¯Ëæ»úÊý
+	ifstream leadIn;		//Ö÷ÅäÖÃµ¼ÈëÆ÷
 	string chrLeadIn;
-	cout << "æŒ‡å®šé…ç½®æ–‡ä»¶:";
+	cout << "Ö¸¶¨ÅäÖÃÎÄ¼þ:";
 	do
 	{
 		cin >> chrLeadIn;
 		leadIn.open(chrLeadIn);
 		if (leadIn)
 			break;
-		cout << "æ–‡ä»¶æ— æ³•æ‰“å¼€,è¯·æ£€æŸ¥è¾“å…¥å†è¯•ã€?;
+		cout << "ÎÄ¼þÎÞ·¨´ò¿ª,Çë¼ì²éÊäÈëÔÙÊÔ¡£";
 	} while (!leadIn);
 	for (int i = 0; i < NODE_MAX; i++)
 	{
 		for (int j = 0; j < CONNECT_MAX; j++)
 		{
-			record[i].next[j] = 0;	//ç½®ç©º
+			record[i].next[j] = 0;	//ÖÃ¿Õ
 		}
 	}
-	ifstream infile;		//èŠ‚ç‚¹é…ç½®å¯¼å…¥å™?
+	ifstream infile;		//½ÚµãÅäÖÃµ¼ÈëÆ÷
 	string strInfile;
 	leadIn >> strInfile;
 	infile.open(strInfile);
 	if (!infile)
 	{
-		cout << "èŠ‚ç‚¹æ•°æ®æ–‡ä»¶æ— æ³•æ‰“å¼€,è¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€?;
+		cout << "½ÚµãÊý¾ÝÎÄ¼þÎÞ·¨´ò¿ª,Çë¼ì²éÅäÖÃÎÄ¼þÔÙÊÔ¡£";
 		return ERR_FAILED;
 	}
-	cout << "èŠ‚ç‚¹æ•°æ®æ–‡ä»¶æ‰“å¼€æˆåŠŸ" << endl;
-	infile >> nodeNumber;		//ç¬¬ä¸€ä¸ªæ•°æ®ä¸ºèŠ‚ç‚¹æ€»æ•°
-	cout << "æ–‡ä»¶å¤´è®°è½?èŠ‚ç‚¹æ€»æ•° = " << nodeNumber << endl;
+	cout << "½ÚµãÊý¾ÝÎÄ¼þ´ò¿ª³É¹¦" << endl;
+	infile >> nodeNumber;		//µÚÒ»¸öÊý¾ÝÎª½Úµã×ÜÊý
+	cout << "ÎÄ¼þÍ·¼ÇÔØ.½Úµã×ÜÊý = " << nodeNumber << endl;
 	if (nodeNumber>NODE_MAX)
 	{
-		cout << "èŠ‚ç‚¹æ•°è¿‡å¤šï¼Œè¯·è°ƒæ•´è®¾ç½®åŽé‡è¯•ã€? << endl;
+		cout << "½ÚµãÊý¹ý¶à£¬Çëµ÷ÕûÉèÖÃºóÖØÊÔ¡£" << endl;
 		return ERR_FAILED;
 	}
 	for (int i = 1; i <= nodeNumber; i++)
@@ -149,16 +115,16 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream SP;				//æœåŠ¡æ•°æ®å¯¼å…¥å™?
+	ifstream SP;				//·þÎñÊý¾Ýµ¼ÈëÆ÷
 	string strSP;
 	leadIn >> strSP;
 	SP.open(strSP);
 	if (!SP)
 	{
-		cout << "æœåŠ¡æ•°æ®æ— æ³•æ‰“å¼€ï¼Œè¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€? << endl;
+		cout << "·þÎñÊý¾ÝÎÞ·¨´ò¿ª£¬Çë¼ì²éÅäÖÃÎÄ¼þÔÙÊÔ¡£" << endl;
 		return ERR_FAILED;
 	}
-	cout << "æœåŠ¡æ•°æ®æ‰“å¼€æˆåŠŸ" << endl;
+	cout << "·þÎñÊý¾Ý´ò¿ª³É¹¦" << endl;
 	for (int i = 1; i <= nodeNumber; i++)
 	{
 		int count;
@@ -185,34 +151,30 @@ status initialization()
 		}
 	}
 	cout << "End." << endl;
-	ifstream timeLimit;			//æˆªæ­¢æœŸæ•°æ®å¯¼å…¥å™¨
+	ifstream timeLimit;			//½ØÖ¹ÆÚÊý¾Ýµ¼ÈëÆ÷
 	string chrTimeLimit{ 0 };
 	leadIn >> chrTimeLimit;
 	timeLimit.open(chrTimeLimit);
 	if (!timeLimit)
 	{
-		cout << "æˆªæ­¢æœŸæ•°æ®æ— æ³•æ‰“å¼€ï¼Œè¯·æ£€æŸ¥é…ç½®æ–‡ä»¶å†è¯•ã€? << endl;
+		cout << "½ØÖ¹ÆÚÊý¾ÝÎÞ·¨´ò¿ª£¬Çë¼ì²éÅäÖÃÎÄ¼þÔÙÊÔ¡£" << endl;
 		return ERR_FAILED;
 	}
-	cout << "æˆªæ­¢æœŸæ•°æ®æ‰“å¼€æˆåŠŸ" << endl;
+	cout << "½ØÖ¹ÆÚÊý¾Ý´ò¿ª³É¹¦" << endl;
 	timeLimit >> limit;
 	timeLimit.close();
 	if (!(limit>0))
 	{
-		cout << "æˆªæ­¢æœŸæ•°æ®æœ‰æ•ˆæ€§éªŒè¯å¤±è´¥ï¼Œè¯·æ£€æŸ¥æ•°æ®æ–‡ä»¶å†è¯•ã€? << endl;
+		cout << "½ØÖ¹ÆÚÊý¾ÝÓÐÐ§ÐÔÑéÖ¤Ê§°Ü£¬Çë¼ì²éÊý¾ÝÎÄ¼þÔÙÊÔ¡£" << endl;
 		return ERR_BADDATA;
 	}
-	cout << "æˆªæ­¢æœŸä¸º" << limit << "ã€? << endl << "End." << endl;
-	cout << "æ•°æ®å¯¼å…¥å®Œæˆã€? << endl;
+	cout << "½ØÖ¹ÆÚÎª" << limit << "¡£" << endl << "End." << endl;
+	cout << "Êý¾Ýµ¼ÈëÍê³É¡£" << endl;
 	leadIn.close();
-	return SUCCESS;			//æ“ä½œæˆåŠŸè¿”å›ž
+	return SUCCESS;			//²Ù×÷³É¹¦·µ»Ø
 }
-<<<<<<< HEAD
-//å¯»æ‰¾åˆå§‹è§?
-=======
 
 //Ñ°ÕÒ³õÊ¼½â
->>>>>>> parent of fd6eaec... 201712230011 with bug.
 status firstSolve()
 {
 	solveQuene[1].quene = 1;
@@ -233,81 +195,27 @@ status firstSolve()
 	} while (serviceChoose()!=SUCCESS);
 	{
 		int i = 1;
-		cout << "åˆå§‹è§?;
+		cout << "³õÊ¼½â";
 		while (solveQuene[i].quene != 0)
 		{
 			cout << "->" << solveQuene[i].quene;
 			i++;
 		}
 		cout << endl;
-		cout << "è·¯å¾„é•¿åº¦" << solveQuene[0].quene;
+		cout << "Â·¾¶³¤¶È" << solveQuene[0].quene;
 		cout << endl;
-<<<<<<< HEAD
-		cout << "ä»·å€? << sumUp(solveQuene) << endl;
-=======
->>>>>>> parent of fd6eaec... 201712230011 with bug.
 	}
 	return SUCCESS;
 }
-//å±€éƒ¨ä¼˜åŒ?
+//¾Ö²¿ÓÅ»¯
 status localOptimization()
 {
 	
 	return SUCCESS;
 }
-//æœåŠ¡é€‰æ‹©
+//·þÎñÑ¡Ôñ
 status serviceChoose()
 {
-<<<<<<< HEAD
-	SolveQuene tempQuene[NODE_MAX];
-	chose(solveQuene, tempQuene, 1);
-	return SUCCESS;
-}
-//æœåŠ¡é€‰æ‹©é€’å½’ä½?
-status chose(SolveQuene orig[], SolveQuene temp[],int i)
-{
-	if (i==orig[0].quene+1)
-	{
-		return SUCCESS;
-	}
-	else
-	{
-		for (int i = 0; i < record[solveQuene[i].quene].serviceCount; i++)
-		{
-			solveQuene[i].service = i;
-			chose(orig, temp, i + 1);
-			if (sumUp(temp)!=-1&&sumUp(temp)<sumUp(orig))	//TODO.
-			{
-				for (int i = 1; i <= orig[0].quene; i++)
-				{
-					orig[i].service = temp[i].service;
-				}
-			}
-		}
-	}
-
-}
-//å€¼ç´¯åŠ å™¨
-int sumUp(SolveQuene input[])
-{
-	int sumc{ 0 };
-	int sumt{ 0 };
-	for (int i = 1; i <= input[0].quene; i++)
-	{
-		sumc += record[input[i].quene].c[input[i].service];
-		sumt += record[input[i].quene].t[input[i].service];
-	}
-	if (sumt>limit)
-	{
-		return -1;
-	}
-	else
-	{
-		return sumc;
-	}
-}
-=======
 
 	return SUCCESS;
 }
->>>>>>> parent of fd6eaec... 201712230011 with bug.
