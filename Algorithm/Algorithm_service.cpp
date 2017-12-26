@@ -7,11 +7,13 @@ typedef int status;
 #define SUCCESS 0			//操作成功	
 #define ERR_FAILED -1		//错误：操作失败
 #define ERR_BADDATA -2		//错误：坏数据
+#define ERR_NOSOLVE -3		//错误：无解
 
-//参数体
+//常参体
 #define NODE_MAX 512		//设置节点最大数
 #define CONNECT_MAX 8		//设置前驱/后继最大连接数
 #define SERVICE_MAX 16		//设置服务最大数
+#define SEARCH_DEEPTH 1024	//设置循环搜索次数
 
 //数据结构
 struct V					//V节点
@@ -38,7 +40,7 @@ status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
 status serviceChoose();		//服务选择
-status chose(const int i);		//单步服务选择
+status chose(const int i);	//单步服务选择
 int sumUp(SolveQuene[]);	//值累加器
 
 //实例化
@@ -48,16 +50,15 @@ SolveQuene tempQuene[NODE_MAX];		//解数列交换储存
 
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
-
+bool debug = { true };		//设置debug信息打印输出
 
 int main()					//主函数
 {
 	initialization();
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		firstSolve();
 	}
-	firstSolve();
 	system("pause");
 	return 0;
 }
@@ -95,7 +96,10 @@ status initialization()
 	}
 	cout << "节点数据文件打开成功" << endl;
 	infile >> nodeNumber;		//第一个数据为节点总数
-	cout << "文件头记载.节点总数 = " << nodeNumber << endl;
+	if (debug)
+	{
+		cout << "文件头记载.节点总数 = " << nodeNumber << endl;
+	}
 	if (nodeNumber>NODE_MAX)
 	{
 		cout << "节点数过多，请调整设置后重试。" << endl;
@@ -115,12 +119,15 @@ status initialization()
 		}
 	}
 	infile.close();
-	for (int i = 1; i <= nodeNumber; i++)
+	if (debug)
 	{
-		cout << "Node " << setw(2) << i << " has following " << record[i].countNext << " next node(s): " << endl;
-		for (int j = 0; j < record[i].countNext; j++)
+		for (int i = 1; i <= nodeNumber; i++)
 		{
-			cout << j << '\t' << record[i].next[j] << endl;
+			cout << "Node " << setw(2) << i << " has following " << record[i].countNext << " next node(s): " << endl;
+			for (int j = 0; j < record[i].countNext; j++)
+			{
+				cout << j << '\t' << record[i].next[j] << endl;
+			}
 		}
 	}
 	cout << "End." << endl;
@@ -149,14 +156,17 @@ status initialization()
 		}
 	}
 	SP.close();
-	for (int i = 1; i <= nodeNumber; i++)
+	if (debug)
 	{
-		cout << "Node " << setw(2) << i << " has " << record[i].serviceCount << " following service(s): " << endl;
-		for (int j = 0; j < record[i].serviceCount; j++)
+		for (int i = 1; i <= nodeNumber; i++)
 		{
-			cout << "SP[" << j << "]" << endl;
-			cout << 't' << '\t' << record[i].t[j] << endl;
-			cout << 'c' << '\t' << record[i].c[j] << endl;
+			cout << "Node " << setw(2) << i << " has " << record[i].serviceCount << " following service(s): " << endl;
+			for (int j = 0; j < record[i].serviceCount; j++)
+			{
+				cout << "SP[" << j << "]" << endl;
+				cout << 't' << '\t' << record[i].t[j] << endl;
+				cout << 'c' << '\t' << record[i].c[j] << endl;
+			}
 		}
 	}
 	cout << "End." << endl;
@@ -177,17 +187,22 @@ status initialization()
 		cout << "截止期数据有效性验证失败，请检查数据文件再试。" << endl;
 		return ERR_BADDATA;
 	}
-	cout << "截止期为" << limit << "。" << endl << "End." << endl;
+	if (debug)
+	{
+		cout << "截止期为" << limit << "。" << endl ;
+	}
+	cout << "End." << endl;
 	cout << "数据导入完成。" << endl;
+	cout << "End." << endl;
 	leadIn.close();
 	return SUCCESS;			//操作成功返回
 }
-
 //寻找初始解
 status firstSolve()
 {
 	solveQuene[1].quene = 1;
 	int locate = 1;
+	int loop{ 0 };
 	do
 	{
 		int i = 2;
@@ -201,15 +216,20 @@ status firstSolve()
 			solveQuene[0].quene = i;
 			i++;
 		}
+		if (loop>SEARCH_DEEPTH)
+		{
+			break;
+			cout << "无法满足条件，提前退出。" << endl;
+		}
+		loop++;
 	} while (serviceChoose() != SUCCESS);
-	serviceChoose();
+	if (debug)
 	{
 		int i = 1;
 		cout << "初始解";
-		while (solveQuene[i].quene != 0)
+		for(int i=1;i<= solveQuene[0].quene;i++)
 		{
 			cout << "->" << solveQuene[i].quene;
-			i++;
 		}
 		cout << endl;
 		cout << "路径长度" << solveQuene[0].quene;
@@ -221,20 +241,42 @@ status firstSolve()
 //局部优化
 status localOptimization()
 {
-
+	for (int  i = 0; i <= solveQuene[0].quene; i++)
+	{
+		tempQuene[i].quene = solveQuene[i].quene;
+		tempQuene[i].quene = solveQuene[i].quene;
+	}
+	for (int i = solveQuene[0].quene; i > 0; i--)
+	{
+		if (record[tempQuene[i].quene].serviceCount > 1)
+		{
+			for (int j = 0; j < record[tempQuene[i].quene].serviceCount; j++)
+			{
+				tempQuene[i].quene = record[tempQuene[i].quene].next[j];
+				//TODO.. 
+			}
+		}
+	}
 	return SUCCESS;
 }
 //服务选择
 status serviceChoose()
 {
-	chose(1);
-	return SUCCESS;
+	if (chose(1)==SUCCESS)
+	{
+		return SUCCESS;
+	}
+	return ERR_NOSOLVE;
 }
 //服务选择递归体
 status chose(const int i)
 {
 	if (i == solveQuene[0].quene + 1)
 	{
+		if (sumUp(solveQuene)==-1)
+		{
+			return ERR_NOSOLVE;
+		}
 		return SUCCESS;
 	}
 	else
@@ -252,7 +294,7 @@ status chose(const int i)
 			}
 		}
 	}
-
+	return ERR_NOSOLVE;	//消除Warning用
 }
 //值累加器
 int sumUp(SolveQuene input[])
