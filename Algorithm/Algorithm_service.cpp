@@ -40,7 +40,8 @@ status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
 status serviceChoose();		//服务选择
-status chose(const int i);	//单步服务选择
+status chose(SolveQuene quene[], const int i);
+							//单步服务选择
 int sumUp(SolveQuene[]);	//值累加器
 
 //实例化
@@ -241,19 +242,28 @@ status firstSolve()
 //局部优化
 status localOptimization()
 {
+	//拷贝一份当前状态
 	for (int  i = 0; i <= solveQuene[0].quene; i++)
 	{
 		tempQuene[i].quene = solveQuene[i].quene;
 		tempQuene[i].quene = solveQuene[i].quene;
 	}
+	//使用副本寻找路径并估值
 	for (int i = solveQuene[0].quene; i > 0; i--)
 	{
 		if (record[tempQuene[i].quene].serviceCount > 1)
 		{
-			for (int j = 0; j < record[tempQuene[i].quene].serviceCount; j++)
+			if (tempQuene[i].service>0)	//向上（小端）寻找领域路径
 			{
-				tempQuene[i].quene = record[tempQuene[i].quene].next[j];
-				//TODO.. 
+				tempQuene[i].service -= 1;
+				int loop{ i + 1 };
+				do
+				{
+					//上端路径的最下路径（领域）
+					tempQuene[i].quene = record[tempQuene[i - 1].quene].next[record[tempQuene[i - 1].quene].countNext];
+					loop++;
+				} while (tempQuene[loop].quene!=17);
+				tempQuene[0].quene = loop - 1;
 			}
 		}
 	}
@@ -262,18 +272,18 @@ status localOptimization()
 //服务选择
 status serviceChoose()
 {
-	if (chose(1)==SUCCESS)
+	if (chose(solveQuene,1)==SUCCESS)
 	{
 		return SUCCESS;
 	}
 	return ERR_NOSOLVE;
 }
 //服务选择递归体
-status chose(const int i)
+status chose(SolveQuene quene[], const int i)
 {
-	if (i == solveQuene[0].quene + 1)
+	if (i == quene[0].quene + 1)
 	{
-		if (sumUp(solveQuene)==-1)
+		if (sumUp(quene)==-1)
 		{
 			return ERR_NOSOLVE;
 		}
@@ -281,15 +291,15 @@ status chose(const int i)
 	}
 	else
 	{
-		for (int j = 0; j < record[solveQuene[i].quene].serviceCount; j++)
+		for (int j = 0; j < record[quene[i].quene].serviceCount; j++)
 		{
-			tempQuene[i].service = j;
-			chose(i + 1);
-			if (sumUp(tempQuene) != -1 && sumUp(tempQuene)<sumUp(solveQuene))	//TODO.
+			quene[i].service = j;
+			chose(quene,i + 1);
+			if (sumUp(quene) != -1 && sumUp(quene)<sumUp(quene))
 			{
-				for (int k = 1; k <= solveQuene[0].quene; k++)
+				for (int k = 1; k <= quene[0].quene; k++)
 				{
-					solveQuene[k].service = tempQuene[k].service;
+					quene[k].service = quene[k].service;
 				}
 			}
 		}
