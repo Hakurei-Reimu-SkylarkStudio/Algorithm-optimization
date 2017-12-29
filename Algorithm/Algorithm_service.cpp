@@ -39,6 +39,8 @@ struct SolveQuene			//解存放区
 status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
+status singleLocalOptimization();
+							//单步局部优化
 status serviceChoose(SolveQuene quene[]);
 							//服务选择
 status chose(SolveQuene quene[], const int i);
@@ -63,7 +65,7 @@ int main()					//主函数
 		firstSolve();			//寻找初始解
 		localOptimization();	//局部优化
 	}
-	
+
 	system("pause");
 	return 0;
 }
@@ -105,7 +107,7 @@ status initialization()
 	{
 		cout << "文件头记载.节点总数 = " << nodeNumber << endl;
 	}
-	if (nodeNumber>NODE_MAX)
+	if (nodeNumber > NODE_MAX)
 	{
 		cout << "节点数过多，请调整设置后重试。" << endl;
 		return ERR_FAILED;
@@ -187,14 +189,14 @@ status initialization()
 	cout << "截止期数据打开成功" << endl;
 	timeLimit >> limit;
 	timeLimit.close();
-	if (!(limit>0))
+	if (!(limit > 0))
 	{
 		cout << "截止期数据有效性验证失败，请检查数据文件再试。" << endl;
 		return ERR_BADDATA;
 	}
 	if (debug)
 	{
-		cout << "截止期为" << limit << "。" << endl ;
+		cout << "截止期为" << limit << "。" << endl;
 	}
 	cout << "End." << endl;
 	cout << "数据导入完成。" << endl;
@@ -224,7 +226,7 @@ status firstSolve()
 			solveQuene[0].quene = i;
 			i++;
 		}
-		if (loop>SEARCH_DEEPTH)
+		if (loop > SEARCH_DEEPTH)
 		{
 			cout << "预留计算资源耗尽，提前退出。" << endl;
 			break;
@@ -236,7 +238,7 @@ status firstSolve()
 	{
 		int i = 1;
 		cout << "初始解";
-		for(int i=1;i<= solveQuene[0].quene;i++)
+		for (int i = 1; i <= solveQuene[0].quene; i++)
 		{
 			cout << "->" << solveQuene[i].quene;
 		}
@@ -248,16 +250,18 @@ status firstSolve()
 	}
 	return SUCCESS;
 }
-//局部优化
-status localOptimization()
+//单步局部优化
+status singleLocalOptimization()
 {
 	//拷贝一份当前状态
-	for (int  i = 0; i <= solveQuene[0].quene; i++)
+	for (int i = 0; i <= solveQuene[0].quene; i++)
 	{
 		downTempQuene[i].quene = solveQuene[i].quene;
 		downTempQuene[i].service = solveQuene[i].service;
+		upTempQuene[i].quene = solveQuene[i].quene;
+		upTempQuene[i].service = solveQuene[i].service;
 	}
-	//使用副本寻找路径并估值
+	//使用副本寻找上端邻域路径并估值
 	for (int i = solveQuene[0].quene; i > 0; i--)
 	{
 
@@ -274,11 +278,11 @@ status localOptimization()
 				}
 			}
 			//向上（小端）寻找邻域路径
-			if (loadNode>0)
+			if (loadNode > 0)
 			{
 				//将上部相邻节点挂载到解队列
-				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[loadNode-1];		//切换节点到上端邻域路径
-				if (downTempQuene[i + 1].quene == 17)
+				downTempQuene[i + 1].quene = record[downTempQuene[i].quene].next[loadNode - 1];		//切换节点到上端邻域路径
+				if (downTempQuene[i + 1].quene == 17)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
 				{
 					downTempQuene[0].quene = i + 1;	//记录路径长度
 				}
@@ -289,9 +293,8 @@ status localOptimization()
 					{
 						//上端路径的最下路径（邻域）
 						downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].nextCount - 1];
-						//downTempQuene[0].quene = loop;	//下方统一赋值减小开销
 						loop++;
-					} while (downTempQuene[loop].quene != 17);
+					} while (downTempQuene[loop - 1].quene != 17);
 					downTempQuene[0].quene = loop - 1;	//记录路径长度
 				}
 				//上邻域可行
@@ -301,7 +304,7 @@ status localOptimization()
 					if (debug)
 					{
 						int i = 1;
-						cout << "上邻域可行，路径：";
+						cout << "上邻域路径：";
 						for (int i = 1; i <= downTempQuene[0].quene; i++)
 						{
 							cout << "->" << downTempQuene[i].quene;
@@ -316,12 +319,71 @@ status localOptimization()
 			}
 		}
 	}
+	//使用副本寻找下端邻域路径并估值
+	for (int i = solveQuene[0].quene; i > 0; i--)
+	{
+
+		//寻找分支点
+		if (record[upTempQuene[i].quene].nextCount > 1)
+		{
+			int loadNode{ 0 };	//记录当前节点到下一节点的next序号
+			for (int j = 0; j < record[upTempQuene[i].quene].serviceCount; j++)
+			{
+				if (record[upTempQuene[i].quene].next[j] == upTempQuene[i + 1].quene)
+				{
+					loadNode = j;
+					break;
+				}
+			}
+			//向下（大端）寻找邻域路径
+			if (loadNode < record[upTempQuene[i].quene].nextCount - 1)
+			{
+				//将下部相邻节点挂载到解队列
+				upTempQuene[i + 1].quene = record[upTempQuene[i].quene].next[loadNode + 1];		//切换节点到上端邻域路径
+				if (upTempQuene[i + 1].quene == 17)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
+				{
+					upTempQuene[0].quene = i + 1;	//记录路径长度
+				}
+				else
+				{
+					int loop{ i + 2 };
+					do
+					{
+						//下端路径的最上路径（邻域）
+						upTempQuene[loop].quene = record[upTempQuene[loop - 1].quene].next[0];
+						loop++;
+					} while (upTempQuene[loop - 1].quene != 17);
+					upTempQuene[0].quene = loop - 1;	//记录路径长度
+				}
+				//下邻域可行
+				if (serviceChoose(upTempQuene) == SUCCESS)
+				{
+					upTempQuene[0].service = sumUp(upTempQuene);
+					if (debug)
+					{
+						int i = 1;
+						cout << "下邻域路径：";
+						for (int i = 1; i <= upTempQuene[0].quene; i++)
+						{
+							cout << "->" << upTempQuene[i].quene;
+						}
+						cout << endl;
+						cout << "路径长度" << upTempQuene[0].quene;
+						cout << endl;
+						cout << "价值" << upTempQuene[0].service << endl;
+					}
+					break;
+				}
+			}
+		}
+	}
+
 	return SUCCESS;
 }
 //服务选择
 status serviceChoose(SolveQuene quene[])
 {
-	if (chose(quene,1)!=SUCCESS)
+	if (chose(quene, 1) != SUCCESS)
 	{
 		return ERR_NOSOLVE;
 	}
@@ -332,7 +394,7 @@ status chose(SolveQuene quene[], const int i)
 {
 	if (i == quene[0].quene + 1)
 	{
-		if (sumUp(quene)==-1)
+		if (sumUp(quene) == -1)
 		{
 
 			return ERR_NOSOLVE;
@@ -344,8 +406,8 @@ status chose(SolveQuene quene[], const int i)
 		for (int j = 0; j < record[quene[i].quene].serviceCount; j++)
 		{
 			quene[i].service = j;
-			chose(quene,i + 1);
-			if (sumUp(quene) != -1 && sumUp(quene)<sumUp(quene))
+			chose(quene, i + 1);
+			if (sumUp(quene) != -1 && sumUp(quene) < sumUp(quene))
 			{
 				for (int k = 1; k <= quene[0].quene; k++)
 				{
@@ -366,7 +428,7 @@ int sumUp(SolveQuene input[])
 		sumc += record[input[i].quene].c[input[i].service];
 		sumt += record[input[i].quene].t[input[i].service];
 	}
-	if (sumt>limit)
+	if (sumt > limit)
 	{
 		return -1;
 	}
