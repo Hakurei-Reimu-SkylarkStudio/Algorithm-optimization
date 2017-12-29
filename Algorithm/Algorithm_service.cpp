@@ -15,7 +15,7 @@ typedef int status;
 #define SERVICE_MAX 16		//设置服务最大数
 #define SEARCH_DEEPTH 1024	//设置循环搜索次数
 #define LOOP_DEPTH 16		//设置优化路径深度
-#define Ver "1.0.2"			//版本号
+#define Ver "1.4.0"			//版本号
 
 
 //数据结构
@@ -542,16 +542,17 @@ void commandManager()
 		cin >> userInput;
 		if (userInput=="loop"||userInput=="lp")
 		{
+			cin.ignore();
 			int loop{ 0 };
 			cout << "输入跳出次数:" << endl;
 			cin >> loop;
 			for (int i = 0; i < loop; i++)
 			{
 				firstSolve();
-				firstSolve();
+				localOptimization();
 			}
 		}
-		if (userInput=="initialization"||userInput=="in")
+		else if (userInput=="initialization"||userInput=="in")
 		{
 			initialization();
 		}
@@ -566,7 +567,7 @@ void commandManager()
 		else if (userInput == "solve" || userInput == "sl")
 		{
 			firstSolve();
-			firstSolve();
+			localOptimization();
 		}
 		else if(userInput=="debugOn"||userInput=="don")
 		{
@@ -599,6 +600,7 @@ void commandManager()
 		{
 			cout << "无效输入。请重新输入（输入\"help\"查看帮助）" << endl;
 		}
+		cin.ignore();
 	}
 	
 }
