@@ -256,14 +256,25 @@ status localOptimization()
 	//使用副本寻找路径并估值
 	for (int i = solveQuene[0].quene; i > 0; i--)
 	{
+
 		//寻找分支点
 		if (record[downTempQuene[i].quene].nextCount > 1)
 		{
+			int loadNode{ 0 };	//记录当前节点到下一节点的next序号
+			for (int j = 0; j < record[downTempQuene[i].quene].serviceCount; j++)
+			{
+				if (record[downTempQuene[i].quene].next[j] == downTempQuene[i + 1].quene)
+				{
+					loadNode = j;
+					break;
+				}
+			}
+			cout << "LD"<<loadNode << endl;
 			//向上（小端）寻找领域路径
-			if (downTempQuene[i].quene>0)	//Fix me:向上寻找路径
+			if (loadNode>0)
 			{
 				//将上部相邻节点挂载到解队列
-				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[downTempQuene[i].quene-1];
+				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[loadNode-1];		//FIXME
 				int loop{ i + 1 };
 				do
 				{
