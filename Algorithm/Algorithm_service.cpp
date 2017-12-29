@@ -39,15 +39,17 @@ struct SolveQuene			//解存放区
 status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
-status serviceChoose();		//服务选择
+status serviceChoose(SolveQuene quene[]);
+							//服务选择
 status chose(SolveQuene quene[], const int i);
 							//单步服务选择
 int sumUp(SolveQuene[]);	//值累加器
 
 //实例化
 V record[NODE_MAX];
-SolveQuene solveQuene[NODE_MAX];	//解数列
-SolveQuene tempQuene[NODE_MAX];		//解数列交换储存
+SolveQuene solveQuene[NODE_MAX];	//解队列
+SolveQuene downTempQuene[NODE_MAX];	//下方解队列交换储存
+SolveQuene upTempQuene[NODE_MAX];	//上方解队列交换储存
 
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
@@ -55,11 +57,9 @@ bool debug = { true };		//设置debug信息打印输出
 
 int main()					//主函数
 {
-	initialization();
-	for (int i = 0; i < 10; i++)
-	{
-		firstSolve();
-	}
+	initialization();		//初始化
+	firstSolve();			//寻找初始解
+	localOptimization();	//局部优化
 	system("pause");
 	return 0;
 }
@@ -202,15 +202,18 @@ status initialization()
 status firstSolve()
 {
 	solveQuene[1].quene = 1;
-	int locate = 1;
+	//int locate = 1;
 	int loop{ 0 };
+	//寻找一个合理的初始解队列
 	do
 	{
 		int i = 2;
+		//清空解队列
 		for (int x = 0; x < NODE_MAX; x++)
 		{
 			solveQuene[i].quene = 0;
 		}
+		//首解随机寻路
 		while (solveQuene[i - 1].quene != nodeNumber)
 		{
 			solveQuene[i].quene = record[solveQuene[i - 1].quene].next[rand() % record[solveQuene[i - 1].quene].countNext];
@@ -219,11 +222,12 @@ status firstSolve()
 		}
 		if (loop>SEARCH_DEEPTH)
 		{
+			cout << "预留计算资源耗尽，提前退出。" << endl;
 			break;
-			cout << "无法满足条件，提前退出。" << endl;
 		}
 		loop++;
-	} while (serviceChoose() != SUCCESS);
+	} while (serviceChoose(solveQuene) != SUCCESS);
+	solveQuene[0].service = sumUp(solveQuene);	//存放价值
 	if (debug)
 	{
 		int i = 1;
@@ -235,7 +239,8 @@ status firstSolve()
 		cout << endl;
 		cout << "路径长度" << solveQuene[0].quene;
 		cout << endl;
-		cout << "价值" << sumUp(solveQuene) << endl;
+		cout << "价值" << solveQuene[0].service;
+		cout << endl;
 	}
 	return SUCCESS;
 }
@@ -245,38 +250,58 @@ status localOptimization()
 	//拷贝一份当前状态
 	for (int  i = 0; i <= solveQuene[0].quene; i++)
 	{
-		tempQuene[i].quene = solveQuene[i].quene;
-		tempQuene[i].quene = solveQuene[i].quene;
+		downTempQuene[i].quene = solveQuene[i].quene;
+		downTempQuene[i].service = solveQuene[i].service;
 	}
 	//使用副本寻找路径并估值
 	for (int i = solveQuene[0].quene; i > 0; i--)
 	{
-		if (record[tempQuene[i].quene].serviceCount > 1)
+		if (record[downTempQuene[i].quene].serviceCount > 1)
 		{
-			if (tempQuene[i].service>0)	//向上（小端）寻找领域路径
+			if (downTempQuene[i].service>0)	//向上（小端）寻找领域路径
 			{
-				tempQuene[i].service -= 1;
+				downTempQuene[i].service -= 1;
 				int loop{ i + 1 };
 				do
 				{
 					//上端路径的最下路径（领域）
-					tempQuene[i].quene = record[tempQuene[i - 1].quene].next[record[tempQuene[i - 1].quene].countNext];
+					downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].countNext];
+					//downTempQuene[0].quene = loop;	//下方统一赋值减小开销
 					loop++;
-				} while (tempQuene[loop].quene!=17);
-				tempQuene[0].quene = loop - 1;
+				} while (downTempQuene[loop].quene!=17);
+				downTempQuene[0].quene = loop - 1;	//记录路径长度
+				//TODO.寻找最优解并储存结果。
+				if (serviceChoose(downTempQuene) == SUCCESS)
+				{
+					downTempQuene[0].service = sumUp(downTempQuene);
+				}
+				if (debug)
+				{
+					int i = 1;
+					cout << "上领域可行，路径：";
+					for (int i = 1; i <= downTempQuene[0].quene; i++)
+					{
+						cout << "->" << downTempQuene[i].quene;
+					}
+					cout << endl;
+					cout << "路径长度" << downTempQuene[0].quene;
+					cout << endl;
+					cout << "价值" << downTempQuene[0].service << endl;
+				}
+
 			}
 		}
 	}
 	return SUCCESS;
 }
 //服务选择
-status serviceChoose()
+status serviceChoose(SolveQuene quene[])
 {
-	if (chose(solveQuene,1)==SUCCESS)
+	if (chose(quene,1)!=SUCCESS)
 	{
-		return SUCCESS;
+		return ERR_NOSOLVE;
 	}
-	return ERR_NOSOLVE;
+	return SUCCESS;
 }
 //服务选择递归体
 status chose(SolveQuene quene[], const int i)
@@ -285,6 +310,7 @@ status chose(SolveQuene quene[], const int i)
 	{
 		if (sumUp(quene)==-1)
 		{
+
 			return ERR_NOSOLVE;
 		}
 		return SUCCESS;
@@ -304,7 +330,7 @@ status chose(SolveQuene quene[], const int i)
 			}
 		}
 	}
-	return ERR_NOSOLVE;	//消除Warning用
+	return SUCCESS;
 }
 //值累加器
 int sumUp(SolveQuene input[])
