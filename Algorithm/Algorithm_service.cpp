@@ -58,8 +58,12 @@ bool debug = { true };		//设置debug信息打印输出
 int main()					//主函数
 {
 	initialization();		//初始化
-	firstSolve();			//寻找初始解
-	localOptimization();	//局部优化
+	for (int i = 0; i < 10000; i++)
+	{
+		firstSolve();			//寻找初始解
+		localOptimization();	//局部优化
+	}
+	
 	system("pause");
 	return 0;
 }
@@ -269,21 +273,27 @@ status localOptimization()
 					break;
 				}
 			}
-			cout << "LD"<<loadNode << endl;
-			//向上（小端）寻找领域路径
+			//向上（小端）寻找邻域路径
 			if (loadNode>0)
 			{
 				//将上部相邻节点挂载到解队列
-				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[loadNode-1];		//FIXME
-				int loop{ i + 1 };
-				do
+				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[loadNode-1];		//切换节点到上端邻域路径
+				if (downTempQuene[i + 1].quene == 17)
 				{
-					//上端路径的最下路径（领域）
-					downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].nextCount];
-					//downTempQuene[0].quene = loop;	//下方统一赋值减小开销
-					loop++;
-				} while (downTempQuene[loop].quene!=17);
-				downTempQuene[0].quene = loop - 1;	//记录路径长度
+					downTempQuene[0].quene = i + 1;	//记录路径长度
+				}
+				else
+				{
+					int loop{ i + 2 };
+					do
+					{
+						//上端路径的最下路径（邻域）
+						downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].nextCount - 1];
+						//downTempQuene[0].quene = loop;	//下方统一赋值减小开销
+						loop++;
+					} while (downTempQuene[loop].quene != 17);
+					downTempQuene[0].quene = loop - 1;	//记录路径长度
+				}
 				//上邻域可行
 				if (serviceChoose(downTempQuene) == SUCCESS)
 				{
