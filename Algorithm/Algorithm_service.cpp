@@ -14,6 +14,7 @@ typedef int status;
 #define CONNECT_MAX 8		//设置前驱/后继最大连接数
 #define SERVICE_MAX 16		//设置服务最大数
 #define SEARCH_DEEPTH 1024	//设置循环搜索次数
+#define LOOP_DEPTH 16		//设置优化路径深度
 
 //数据结构
 struct V					//V节点
@@ -60,11 +61,8 @@ bool debug = { true };		//设置debug信息打印输出
 int main()					//主函数
 {
 	initialization();		//初始化
-	for (int i = 0; i < 10000; i++)
-	{
-		firstSolve();			//寻找初始解
-		localOptimization();	//局部优化
-	}
+	firstSolve();			//寻找初始解
+	localOptimization();	//局部优化
 
 	system("pause");
 	return 0;
@@ -247,6 +245,71 @@ status firstSolve()
 		cout << endl;
 		cout << "价值" << solveQuene[0].service;
 		cout << endl;
+	}
+	return SUCCESS;
+}
+//局部优化
+status localOptimization()
+{
+	for (int loop = 0; loop < LOOP_DEPTH; loop++)
+	{
+		singleLocalOptimization();
+		if (upTempQuene[0].service>downTempQuene[0].service)
+		{
+			if (downTempQuene[0].service<solveQuene[0].service)
+			{
+				//上端演进
+				for (int i = 0; i <= solveQuene[0].quene; i++)
+				{
+					solveQuene[i].quene = downTempQuene[i].quene;
+					solveQuene[i].service = downTempQuene[i].service;
+				}
+				if (debug)
+				{
+					cout << "选择上端" << endl;
+				}
+			}
+			else
+			{
+				if (debug)
+				{
+					cout << "局部最优" << endl;
+				}
+				break;
+			}
+		}
+		else if (upTempQuene[0].service<downTempQuene[0].service)
+		{
+			if (upTempQuene[0].service<solveQuene[0].service)
+			{
+				//下端演进
+				for (int i = 0; i <= solveQuene[0].quene; i++)
+				{
+					solveQuene[i].quene = upTempQuene[i].quene;
+					solveQuene[i].service = upTempQuene[i].service;
+				}
+				if (debug)
+				{
+					cout << "选择下端" << endl;
+				}
+			}
+			else
+			{
+				if (debug)
+				{
+					cout << "局部最优" << endl;
+				}
+				break;
+			}
+		}
+		else
+		{
+			if (debug)
+			{
+				cout << "局部最优" << endl;
+			}
+			break;
+		}
 	}
 	return SUCCESS;
 }
