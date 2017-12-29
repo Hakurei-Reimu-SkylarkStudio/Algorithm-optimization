@@ -21,7 +21,7 @@ struct V					//V节点
 	//后驱
 	//V* prior[CONNECT_MAX];//前驱结点
 	int next[CONNECT_MAX];	//后继节点
-	int countNext;			//后继数
+	int nextCount;			//后继数
 
 	//服务
 	//int s[SERVICE_MAX];	//名称
@@ -111,7 +111,7 @@ status initialization()
 		int line;
 		//infile.ignore(1);
 		infile >> line;
-		record[i].countNext = line;
+		record[i].nextCount = line;
 		for (int j = 0; j < line; j++)
 		{
 			int addnext;
@@ -124,8 +124,8 @@ status initialization()
 	{
 		for (int i = 1; i <= nodeNumber; i++)
 		{
-			cout << "Node " << setw(2) << i << " has following " << record[i].countNext << " next node(s): " << endl;
-			for (int j = 0; j < record[i].countNext; j++)
+			cout << "Node " << setw(2) << i << " has following " << record[i].nextCount << " next node(s): " << endl;
+			for (int j = 0; j < record[i].nextCount; j++)
 			{
 				cout << j << '\t' << record[i].next[j] << endl;
 			}
@@ -216,7 +216,7 @@ status firstSolve()
 		//首解随机寻路
 		while (solveQuene[i - 1].quene != nodeNumber)
 		{
-			solveQuene[i].quene = record[solveQuene[i - 1].quene].next[rand() % record[solveQuene[i - 1].quene].countNext];
+			solveQuene[i].quene = record[solveQuene[i - 1].quene].next[rand() % record[solveQuene[i - 1].quene].nextCount];
 			solveQuene[0].quene = i;
 			i++;
 		}
@@ -256,39 +256,42 @@ status localOptimization()
 	//使用副本寻找路径并估值
 	for (int i = solveQuene[0].quene; i > 0; i--)
 	{
-		if (record[downTempQuene[i].quene].serviceCount > 1)
+		//寻找分支点
+		if (record[downTempQuene[i].quene].nextCount > 1)
 		{
-			if (downTempQuene[i].service>0)	//向上（小端）寻找领域路径
+			//向上（小端）寻找领域路径
+			if (downTempQuene[i].quene>0)	//Fix me:向上寻找路径
 			{
-				downTempQuene[i].service -= 1;
+				//将上部相邻节点挂载到解队列
+				downTempQuene[i+1].quene =record[downTempQuene[i].quene].next[downTempQuene[i].quene-1];
 				int loop{ i + 1 };
 				do
 				{
 					//上端路径的最下路径（领域）
-					downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].countNext];
+					downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].nextCount];
 					//downTempQuene[0].quene = loop;	//下方统一赋值减小开销
 					loop++;
 				} while (downTempQuene[loop].quene!=17);
 				downTempQuene[0].quene = loop - 1;	//记录路径长度
-				//TODO.寻找最优解并储存结果。
+				//上邻域可行
 				if (serviceChoose(downTempQuene) == SUCCESS)
 				{
 					downTempQuene[0].service = sumUp(downTempQuene);
-				}
-				if (debug)
-				{
-					int i = 1;
-					cout << "上领域可行，路径：";
-					for (int i = 1; i <= downTempQuene[0].quene; i++)
+					if (debug)
 					{
-						cout << "->" << downTempQuene[i].quene;
+						int i = 1;
+						cout << "上邻域可行，路径：";
+						for (int i = 1; i <= downTempQuene[0].quene; i++)
+						{
+							cout << "->" << downTempQuene[i].quene;
+						}
+						cout << endl;
+						cout << "路径长度" << downTempQuene[0].quene;
+						cout << endl;
+						cout << "价值" << downTempQuene[0].service << endl;
 					}
-					cout << endl;
-					cout << "路径长度" << downTempQuene[0].quene;
-					cout << endl;
-					cout << "价值" << downTempQuene[0].service << endl;
+					break;
 				}
-
 			}
 		}
 	}
