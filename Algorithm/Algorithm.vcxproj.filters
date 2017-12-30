@@ -26,12 +26,8 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Algorithm_package.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Algorithm_service.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Text.cpp" />
   </ItemGroup>
 </Project>
