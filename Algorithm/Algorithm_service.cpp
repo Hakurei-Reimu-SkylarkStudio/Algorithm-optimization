@@ -597,7 +597,7 @@ status debugPrint()
 {
 	if (print)
 	{
-		printResult.open(RESULT_FILE_NAME,ios::app);
+		printResult.open(RESULT_FILE_NAME, ios::app);
 		if (!printResult.is_open())
 		{
 			cout << "结果打印失败，请检查文件占用。" << endl;
@@ -624,7 +624,6 @@ status debugPrintLine()
 	}
 	return SUCCESS;
 }
-
 //命令行管理器
 void commandManager()
 {
