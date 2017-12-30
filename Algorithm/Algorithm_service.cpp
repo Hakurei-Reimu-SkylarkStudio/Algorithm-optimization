@@ -15,7 +15,12 @@ typedef int status;
 #define SERVICE_MAX 16		//设置服务最大数
 #define SEARCH_DEEPTH 1024	//设置循环搜索次数
 #define LOOP_DEPTH 16		//设置优化路径深度
+#define FAIL_MAX 3			//局部优化失败退出值
 #define Ver "1.4.0"			//版本号
+#define GIT_ADDRESS "https://github.com/Hakurei-Reimu-SkylarkStudio/Algorithm-optimization"
+							//GitHub地址
+#define RESULT_FILE_NAME "result.txt"
+							//打印结果文件名
 
 
 //数据结构
@@ -43,12 +48,15 @@ status initialization();	//初始化
 status firstSolve();		//寻找初始解
 status localOptimization();	//局部优化
 status singleLocalOptimization();
-							//单步局部优化
+//单步局部优化
 status serviceChoose(SolveQuene quene[]);
-							//服务选择
+//服务选择
 status chose(SolveQuene quene[], const int i);
-							//单步服务选择
+//单步服务选择
 int sumUp(SolveQuene[]);	//值累加器
+status directSolve();		//给出解
+status debugPrint();		//打印结果
+status debugPrintLine();	//打印空行
 void commandManager();		//命令行管理器
 
 //实例化
@@ -60,10 +68,14 @@ SolveQuene upTempQuene[NODE_MAX];	//上方解队列交换储存
 int nodeNumber = 0;			//节点总数
 int limit = 0;				//时间限制
 bool debug = { true };		//设置debug信息打印输出
+bool print = { true };		//设置优化结果打印
+ofstream printResult;		//打印结果到文件
+
 
 int main()					//主函数
 {
 	cout << "Ver:" << Ver << endl;
+	cout << "GitHub addresss:" << endl << GIT_ADDRESS << endl;
 	commandManager();		//通过命令行管理器管理用户输入并操作
 	return 0;
 }
@@ -251,12 +263,13 @@ status firstSolve()
 //局部优化
 status localOptimization()
 {
+	debugPrint();	//打印初始解结果
 	for (int loop = 0; loop < LOOP_DEPTH; loop++)
 	{
 		singleLocalOptimization();
-		if (upTempQuene[0].service>downTempQuene[0].service)
+		if (upTempQuene[0].service > downTempQuene[0].service)
 		{
-			if (downTempQuene[0].service<solveQuene[0].service)
+			if (downTempQuene[0].service < solveQuene[0].service)
 			{
 				//上端演进
 				for (int i = 0; i <= solveQuene[0].quene; i++)
@@ -264,6 +277,7 @@ status localOptimization()
 					solveQuene[i].quene = downTempQuene[i].quene;
 					solveQuene[i].service = downTempQuene[i].service;
 				}
+				debugPrint();
 				if (debug)
 				{
 					cout << "选择上端" << endl;
@@ -275,22 +289,22 @@ status localOptimization()
 				{
 					cout << "局部最优" << endl;
 				}
-					int i = 1;
-					cout << "最优化路径：";
-					for (int i = 1; i <= solveQuene[0].quene; i++)
-					{
-						cout << "->" << solveQuene[i].quene;
-					}
-					cout << endl;
-					cout << "路径长度" << solveQuene[0].quene;
-					cout << endl;
-					cout << "价值" << solveQuene[0].service << endl;
+				int i = 1;
+				cout << "最优化路径：";
+				for (int i = 1; i <= solveQuene[0].quene; i++)
+				{
+					cout << "->" << solveQuene[i].quene;
+				}
+				cout << endl;
+				cout << "路径长度" << solveQuene[0].quene;
+				cout << endl;
+				cout << "价值" << solveQuene[0].service << endl;
 				break;
 			}
 		}
-		else if (upTempQuene[0].service<downTempQuene[0].service)
+		else if (upTempQuene[0].service < downTempQuene[0].service)
 		{
-			if (upTempQuene[0].service<solveQuene[0].service)
+			if (upTempQuene[0].service < solveQuene[0].service)
 			{
 				//下端演进
 				for (int i = 0; i <= solveQuene[0].quene; i++)
@@ -298,6 +312,7 @@ status localOptimization()
 					solveQuene[i].quene = upTempQuene[i].quene;
 					solveQuene[i].service = upTempQuene[i].service;
 				}
+				debugPrint();
 				if (debug)
 				{
 					cout << "选择下端" << endl;
@@ -308,7 +323,7 @@ status localOptimization()
 				if (debug)
 				{
 					cout << "局部最优" << endl;
-				}					
+				}
 				int i = 1;
 				cout << "最优化路径：";
 				for (int i = 1; i <= solveQuene[0].quene; i++)
@@ -342,6 +357,7 @@ status localOptimization()
 			break;
 		}
 	}
+	debugPrintLine();	//打印空行
 	return SUCCESS;
 }
 //单步局部优化
@@ -531,38 +547,118 @@ int sumUp(SolveQuene input[])
 		return sumc;
 	}
 }
+//给出解
+status directSolve()
+{
+	int loop{ 0 };
+	int failTime{ 0 };
+	int min{ 0 };					//最终结果筛选
+	loop = LOOP_DEPTH;
+	int* ptrAns = new int[loop];	//答案值储存队列
+	for (int i = 0; i < loop; i++)
+	{
+		firstSolve();
+		localOptimization();
+		ptrAns[i] = solveQuene[0].service;
+		//指定次数无法优化则提前退出
+		if (i > 0 && ptrAns[i] > ptrAns[i - 1])
+		{
+			failTime++;
+			if (failTime >= FAIL_MAX)
+			{
+				break;
+			}
+		}
+		else
+		{
+			failTime = 0;
+		}
+	}
+	min = ptrAns[0];
+	for (int i = 0; i < loop; i++)
+	{
+		if (ptrAns[i] == 0)
+		{
+			break;
+		}
+		else
+		{
+			if (ptrAns[i] < min)
+			{
+				min = ptrAns[i];
+			}
+		}
+	}
+	cout << endl << "查找结果：" << min << endl << endl;
+	return SUCCESS;
+}
+//打印结果
+status debugPrint()
+{
+	if (print)
+	{
+		printResult.open(RESULT_FILE_NAME,ios::app);
+		if (!printResult.is_open())
+		{
+			cout << "结果打印失败，请检查文件占用。" << endl;
+			return ERR_FAILED;
+		}
+		printResult << solveQuene[0].service << ' ';
+		printResult.close();
+	}
+	return SUCCESS;
+}
+//打印空行
+status debugPrintLine()
+{
+	if (print)
+	{
+		printResult.open(RESULT_FILE_NAME, ios::app);
+		if (!printResult.is_open())
+		{
+			cout << "结果打印失败，请检查文件占用。" << endl;
+			return ERR_FAILED;
+		}
+		printResult << endl;
+		printResult.close();
+	}
+	return SUCCESS;
+}
+
 //命令行管理器
 void commandManager()
 {
 	string userInput;
 	while (true)
 	{
+		system("color 0a");
 		cout << endl;
 		cout << ">";
 		cin >> userInput;
-		if (userInput=="loop"||userInput=="lp")
+		system("color 0e");
+		if (userInput == "loopSolve" || userInput == "ls")
 		{
-			cin.ignore();
+			cout << "重复次数：";
 			int loop{ 0 };
-			cout << "输入最大跳出次数:";
 			cin >> loop;
-			int* ptrAns = new int[loop];	//答案值储存队列
 			for (int i = 0; i < loop; i++)
 			{
-				firstSolve();
-				localOptimization();
-				//TODO：一定次数无优化提前退出无优化
+				directSolve();
 			}
 		}
-		else if (userInput=="initialization"||userInput=="in")
+		else if (userInput == "directSolve" || userInput == "ds")
+		{
+			directSolve();
+		}
+		else if (userInput == "initialization" || userInput == "in")
 		{
 			initialization();
 		}
-		else if (userInput=="firstSolve"||userInput=="fs")
+		else if (userInput == "firstSolve" || userInput == "fs")
 		{
 			firstSolve();
 		}
-		else if (userInput=="localOptimization"||userInput=="lo")
+		else if (userInput == "localOptimization" || userInput == "lo")
 		{
 			localOptimization();
 		}
@@ -571,13 +667,21 @@ void commandManager()
 			firstSolve();
 			localOptimization();
 		}
-		else if(userInput=="debugOn"||userInput=="don")
+		else if (userInput == "debugOn" || userInput == "don")
 		{
 			debug = true;
 		}
-		else if(userInput=="debugOff"||userInput=="doff")
+		else if (userInput == "debugOff" || userInput == "doff")
 		{
 			debug = false;
+		}
+		else if (userInput == "printOn" || userInput == "pon")
+		{
+			print = true;
+		}
+		else if (userInput == "printOff" || userInput == "poff")
+		{
+			print = false;
 		}
 		else if (userInput == "cls")
 		{
@@ -589,7 +693,10 @@ void commandManager()
 			cout << "输入\"firstSolve\"或\"fs\"\n\t寻找初始解。" << endl;
 			cout << "输入\"localOptimization\"或\"lo\"\n\t在初始解的基础上寻找局部最优解。" << endl;
 			cout << "输入\"solve\"或\"sl\"\n\t生成一个局部优化解。" << endl;
-			cout << "输入\"debug[On\\Off]\"或\"d[on\\off]\"\n\t打开\\关闭具体信息。" << endl;
+			cout << "输入\"directSolve\"或\"ds\"\n\t寻找解。" << endl;
+			cout << "输入\"loopSolve\"或\"ls\"\n\t重复寻找解。" << endl;
+			cout << "输入\"debug[On\\Off]\"或\"d[on\\off]\"\n\t打开\\关闭具体信息（默认开启）。" << endl;
+			cout << "输入\"print[On\\Off]\"或\"p[on\\off]\"\n\t打开\\关闭打印信息（默认开启）。" << endl;
 			cout << "输入\"quit\"或\"exit\"\n\t退出。" << endl;
 			cout << "输入\"cls\"\n\t清屏。" << endl;
 			cout << "输入\"help\"\n\t查看帮助。" << endl;
@@ -604,5 +711,5 @@ void commandManager()
 		}
 		cin.ignore();
 	}
-	
+
 }
