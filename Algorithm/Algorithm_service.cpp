@@ -544,12 +544,14 @@ void commandManager()
 		{
 			cin.ignore();
 			int loop{ 0 };
-			cout << "输入跳出次数:" << endl;
+			cout << "输入最大跳出次数:";
 			cin >> loop;
+			int* ptrAns = new int[loop];	//答案值储存队列
 			for (int i = 0; i < loop; i++)
 			{
 				firstSolve();
 				localOptimization();
+				//TODO：一定次数无优化提前退出无优化
 			}
 		}
 		else if (userInput=="initialization"||userInput=="in")
