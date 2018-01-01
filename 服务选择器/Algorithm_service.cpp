@@ -16,7 +16,7 @@ typedef int status;
 #define SEARCH_DEEPTH 1024	//设置循环搜索次数
 #define LOOP_DEPTH 16		//设置优化路径深度
 #define FAIL_MAX 3			//局部优化失败退出值
-#define Ver "1.4.0"			//版本号
+#define Ver "1.5.0"			//版本号
 #define GIT_ADDRESS "https://github.com/Hakurei-Reimu-SkylarkStudio/Algorithm-optimization"
 							//GitHub地址
 #define RESULT_FILE_NAME "result.txt"
@@ -392,7 +392,7 @@ status singleLocalOptimization()
 			{
 				//将上部相邻节点挂载到解队列
 				downTempQuene[i + 1].quene = record[downTempQuene[i].quene].next[loadNode - 1];		//切换节点到上端邻域路径
-				if (downTempQuene[i + 1].quene == 17)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
+				if (downTempQuene[i + 1].quene == nodeNumber)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
 				{
 					downTempQuene[0].quene = i + 1;	//记录路径长度
 				}
@@ -404,7 +404,7 @@ status singleLocalOptimization()
 						//上端路径的最下路径（邻域）
 						downTempQuene[loop].quene = record[downTempQuene[loop - 1].quene].next[record[downTempQuene[loop - 1].quene].nextCount - 1];
 						loop++;
-					} while (downTempQuene[loop - 1].quene != 17);
+					} while (downTempQuene[loop - 1].quene != nodeNumber);
 					downTempQuene[0].quene = loop - 1;	//记录路径长度
 				}
 				//上邻域可行
@@ -450,7 +450,7 @@ status singleLocalOptimization()
 			{
 				//将下部相邻节点挂载到解队列
 				upTempQuene[i + 1].quene = record[upTempQuene[i].quene].next[loadNode + 1];		//切换节点到上端邻域路径
-				if (upTempQuene[i + 1].quene == 17)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
+				if (upTempQuene[i + 1].quene == nodeNumber)	//不写大于以便发生异常时能溢出报错及时发现并解决错误
 				{
 					upTempQuene[0].quene = i + 1;	//记录路径长度
 				}
@@ -462,7 +462,7 @@ status singleLocalOptimization()
 						//下端路径的最上路径（邻域）
 						upTempQuene[loop].quene = record[upTempQuene[loop - 1].quene].next[0];
 						loop++;
-					} while (upTempQuene[loop - 1].quene != 17);
+					} while (upTempQuene[loop - 1].quene != nodeNumber);
 					upTempQuene[0].quene = loop - 1;	//记录路径长度
 				}
 				//下邻域可行
